@@ -311,7 +311,7 @@
     "home.title":["מערכת ניהול תפעולי","Operational Management System"],
     "home.sub":["דמו אינטראקטיבי — כל הנתונים בדיוניים. בחרו מודול כדי להתחיל.","Interactive demo — all data is fictional. Choose a module to begin."],
     "home.production":["בקרת ייצור והתקנה","Production & Installation"],
-    "home.production.d":["פרויקטים, רצפת ייצור, שרטוט אוטומטי, מעקב תת-הרכבה ושיבוץ צוותים","Projects, production floor, automatic drafting, sub-assembly tracking, team scheduling"],
+    "home.production.d":["פרויקטים, רצפת ייצור, שרטוט אוטומטי, לוח דלתות ושיבוץ צוותים","Projects, production floor, automatic drafting, doors board, team scheduling"],
     "home.warehouse":["מלאי ורכש","Warehouse & Procurement"],
     "home.warehouse.d":["מלאי חומרי גלם, ספקים והזמנות רכש","Raw materials, suppliers, purchase orders"],
     "home.hr":["כוח אדם","HR"],
@@ -327,20 +327,20 @@
     "nav.project":["פרטי פרויקט","Project Detail"],
     "nav.drafting":["שרטוט וכתב כמויות","Drafting & BOM"],
     "nav.floor":["רצפת ייצור","Production Floor"],
-    "nav.doors":["מעקב תת-הרכבה","Sub-Assembly Board"],
+    "nav.doors":["לוח דלתות","Doors Board"],
     "nav.schedule":["שיבוץ ולו״ז","Scheduling"],
     "navgroup.production":["ייצור","Production"],
 
     "title.dashboard":["לוח בקרה","Dashboard"],
     "sub.dashboard":["תמונת מצב חיה של כל הפרויקטים הפעילים","Live overview across every active project"],
-    "title.project":["PRJ-101 · פרטי פרויקט","PRJ-101 · Project Detail"],
+    "title.project":["PRJ-2401 · פרטי פרויקט","PRJ-2401 · Project Detail"],
     "sub.project":["חדרים, רכיבים וסטטוס ייצור","Rooms, components, and production status"],
     "title.drafting":["שרטוט וכתב כמויות","Drafting & BOM"],
     "sub.drafting":["משרטוט לכתב כמויות, אוטומטית","From floor plan to bill of materials, automatically"],
     "title.floor":["רצפת ייצור","Production Floor"],
     "sub.floor":["סטטוס רכיבים לאורך כל תחנות הייצור","Component status across every production station"],
-    "title.doors":["מעקב תת-הרכבה","Sub-Assembly Board"],
-    "sub.doors":["מדידה בשטח → ייצור → התקנה","On-site measurement → manufacturing → installation"],
+    "title.doors":["לוח דלתות","Doors Board"],
+    "sub.doors":["מדידת שטח → ייצור → התקנה","Field measurement → manufacturing → installation"],
     "title.schedule":["שיבוץ ולו״ז","Scheduling"],
     "sub.schedule":["ציר זמן ושיבוץ צוותי שטח","Timeline and field-team assignment"],
     "title.warehouse":["מלאי ורכש","Warehouse & Procurement"],
@@ -558,12 +558,11 @@
   }
 
   var projects = [
-    {code:"PRJ-101", nameKey:null, name:"Room A1 / A2", pct:82, status:"good", statusKey:"status.inprod"},
-    {code:"PRJ-104", name:"Unit B12", pct:45, status:"warn", statusKey:"status.await"},
-    {code:"PRJ-108", name:"Block C", pct:100, status:"good", statusKey:"status.ready"},
-    {code:"PRJ-112", name:"Extension D2", pct:20, status:"neutral", statusKey:"status.eng"},
-    {code:"PRJ-115", name:"Site E", pct:63, status:"good", statusKey:"status.inprod"},
-    {code:"PRJ-119", name:"Dock Extension", pct:38, status:"crit", statusKey:"status.blocked"}
+    {code:"PRJ-2401", name:"North Site", pct:78, status:"good", statusKey:"status.inprod"},
+    {code:"PRJ-2402", name:"East Warehouse Unit", pct:42, status:"warn", statusKey:"status.await"},
+    {code:"PRJ-2403", name:"Central Hall", pct:100, status:"good", statusKey:"status.ready"},
+    {code:"PRJ-2404", name:"South Extension", pct:22, status:"crit", statusKey:"status.blocked"},
+    {code:"PRJ-2405", name:"Hilltop Complex", pct:60, status:"good", statusKey:"status.inprod"}
   ];
 
   function renderDashboard(){
@@ -607,9 +606,9 @@
     });
 
     var attnItems = [
-      {sev:"crit", title: lang==="he"?"PRJ-119 — 2 רכיבים נפסלו בבדיקת איכות":"PRJ-119 — 2 components rejected in quality check", meta: lang==="he"?"Dock Extension · תוך 3 ימים":"Dock Extension · due in 3 days"},
-      {sev:"crit", title: lang==="he"?"PRJ-104 — חוסר במלאי רכיב D":"PRJ-104 — missing Component D stock", meta: lang==="he"?"Unit B12 · חוסם התקנה בשטח":"Unit B12 · blocks field install"},
-      {sev:"warn", title: lang==="he"?"PRJ-108 — אבן דרך בשלה לחיוב":"PRJ-108 — payment milestone matured", meta: "Block C"}
+      {sev:"crit", title: lang==="he"?"PRJ-2404 — 2 רכיבים נפסלו ביציקה":"PRJ-2404 — 2 components rejected in casting", meta: lang==="he"?"South Extension · תוך 3 ימים":"South Extension · due in 3 days"},
+      {sev:"crit", title: lang==="he"?"PRJ-2402 — חוסר בלוחות בידוד":"PRJ-2402 — missing insulation sheets", meta: lang==="he"?"East Warehouse Unit · חוסם התקנה בשטח":"East Warehouse Unit · blocks field install"},
+      {sev:"warn", title: lang==="he"?"PRJ-2403 — אבן דרך בשלה לחיוב":"PRJ-2403 — payment milestone matured", meta: "Central Hall"}
     ];
     var attnList = document.getElementById("attnList");
     attnItems.forEach(function(a){
@@ -625,13 +624,13 @@
   function renderProject(){
     var rooms = [
       {name: lang==="he"?"חדר A1":"Room A1", items:[
-        [lang==="he"?"רכיב A":"Component A","6 / 6","Assembly","normal"],
-        [lang==="he"?"רכיב B":"Component B","3 / 3","Finishing","normal"],
-        [lang==="he"?"תת-הרכבה A":"Sub-Assembly A","0 / 1","Design","urgent"]
+        [lang==="he"?"פאנל קיר":"Wall Panel","6 / 6","Casting & Insulation","normal"],
+        [lang==="he"?"פאנל גג":"Roof Panel","3 / 3","Cleaning & Finishing","normal"],
+        [lang==="he"?"דלת כנף":"Hinged Door","0 / 1","Engineering","urgent"]
       ]},
       {name: lang==="he"?"חדר A2":"Room A2", items:[
-        [lang==="he"?"רכיב A":"Component A","8 / 8","Staging","normal"],
-        [lang==="he"?"רכיב C":"Component C","4 / 4","Staging","normal"]
+        [lang==="he"?"פאנל קיר":"Wall Panel","8 / 8","Warehouse Ready","normal"],
+        [lang==="he"?"פינה":"Corner Post","4 / 4","Warehouse Ready","normal"]
       ]}
     ];
     var html = '<div class="info-bar">' +
@@ -654,9 +653,9 @@
   function infoCell(k,v){ return '<div class="info-cell"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
 
   var presets = [
-    {key:"preset.a", w:4, h:3, bom:[["Component A",14,7840],["Component B",6,3960],["Component C",4,1240],["Sub-Assembly A",1,2380],["Component D",12,2160]]},
-    {key:"preset.b", w:5.5, h:3.2, lshape:true, bom:[["Component A",19,10640],["Component B",8,5280],["Component C",6,1860],["Sub-Assembly B",1,3120],["Component D",17,3060]]},
-    {key:"preset.c", w:6, h:4, bom:[["Component A",20,11200],["Component B",9,5940],["Component C",4,1240],["Sub-Assembly A",2,4760],["Component D",20,3600]]}
+    {key:"preset.a", w:4, h:3, bom:[["Wall Panel",14,7840],["Roof Panel",6,3960],["Corner Post",4,1240],["Hinged Door",1,2380],["Insulation Sheet",12,2160]]},
+    {key:"preset.b", w:5.5, h:3.2, lshape:true, bom:[["Wall Panel",19,10640],["Roof Panel",8,5280],["Corner Post",6,1860],["Sliding Door",1,3120],["Insulation Sheet",17,3060]]},
+    {key:"preset.c", w:6, h:4, bom:[["Wall Panel",20,11200],["Roof Panel",9,5940],["Corner Post",4,1240],["Hinged Door",2,4760],["Insulation Sheet",20,3600]]}
   ];
   var presetIndex = 0;
   function renderDrafting(){
@@ -697,14 +696,14 @@
     document.getElementById("bomTotal").textContent = "₪"+total.toLocaleString();
   }
 
-  var stations = ["Design","Cutting","Forming","Assembly","Finishing","Staging","Dispatch"];
+  var stations = ["Engineering","Sheet Cutting","Cut & Bend","Casting & Insulation","Cleaning & Finishing","Warehouse Ready","Shipped to Site"];
   var components = [
-    {c:"Component A",p:"PRJ-101",st:0,pri:"normal"},{c:"Component C",p:"PRJ-104",st:0,pri:"urgent"},
-    {c:"Component B",p:"PRJ-101",st:1,pri:"normal"},{c:"Component A",p:"PRJ-115",st:1,pri:"normal"},
-    {c:"Sub-Assembly A",p:"PRJ-108",st:2,pri:"normal"},{c:"Component A",p:"PRJ-119",st:2,pri:"urgent"},
-    {c:"Component D",p:"PRJ-101",st:3,pri:"normal"},{c:"Component C",p:"PRJ-115",st:3,pri:"normal"},
-    {c:"Component A",p:"PRJ-104",st:4,pri:"urgent"},{c:"Component B",p:"PRJ-108",st:4,pri:"normal"},
-    {c:"Sub-Assembly B",p:"PRJ-115",st:5,pri:"normal"},{c:"Component A",p:"PRJ-108",st:6,pri:"normal"},{c:"Component B",p:"PRJ-101",st:6,pri:"normal"}
+    {c:"Wall Panel",p:"PRJ-2401",st:0,pri:"normal"},{c:"Corner Post",p:"PRJ-2402",st:0,pri:"urgent"},
+    {c:"Roof Panel",p:"PRJ-2401",st:1,pri:"normal"},{c:"Wall Panel",p:"PRJ-2405",st:1,pri:"normal"},
+    {c:"Hinged Door",p:"PRJ-2403",st:2,pri:"normal"},{c:"Wall Panel",p:"PRJ-2404",st:2,pri:"urgent"},
+    {c:"Insulation Sheet",p:"PRJ-2401",st:3,pri:"normal"},{c:"Corner Post",p:"PRJ-2405",st:3,pri:"normal"},
+    {c:"Wall Panel",p:"PRJ-2402",st:4,pri:"urgent"},{c:"Roof Panel",p:"PRJ-2403",st:4,pri:"normal"},
+    {c:"Sliding Door",p:"PRJ-2405",st:5,pri:"normal"},{c:"Wall Panel",p:"PRJ-2403",st:6,pri:"normal"},{c:"Roof Panel",p:"PRJ-2401",st:6,pri:"normal"}
   ];
   var floorFilter = "all";
   function renderFloor(){
@@ -729,15 +728,15 @@
   }
 
   function renderDoors(){
-    var cols = lang==="he" ? ["ממתין למדידה בשטח","בייצור","ממתין להתקנה","הותקן"] : ["Awaiting On-Site Measurement","In Production","Awaiting Installation","Installed"];
-    var subs = [
-      {p:"PRJ-101",st:0},{p:"PRJ-104",st:1},{p:"PRJ-108",st:2},{p:"PRJ-115",st:1},{p:"PRJ-119",st:0},{p:"PRJ-108",st:3},{p:"PRJ-101",st:3}
+    var cols = lang==="he" ? ["ממתין למדידת שטח","בייצור","ממתין להתקנה","הותקן"] : ["Awaiting Field Measurement","In Production","Awaiting Installation","Installed"];
+    var doors = [
+      {p:"PRJ-2401",st:0},{p:"PRJ-2402",st:1},{p:"PRJ-2403",st:2},{p:"PRJ-2405",st:1},{p:"PRJ-2404",st:0},{p:"PRJ-2403",st:3},{p:"PRJ-2401",st:3}
     ];
     var html = '<div class="kanban">';
     cols.forEach(function(name, idx){
-      var items = subs.filter(function(d){ return d.st===idx; });
+      var items = doors.filter(function(d){ return d.st===idx; });
       html += '<div class="kb-col"><div class="kb-col-head"><b>'+name+'</b> <span class="count num">'+items.length+'</span></div><div class="kb-col-body">';
-      items.forEach(function(d){ html += '<div class="kb-card"><b>'+d.p+'</b><span class="meta">'+(lang==="he"?"תת-הרכבה E":"Sub-Assembly E")+'</span></div>'; });
+      items.forEach(function(d){ html += '<div class="kb-card"><b>'+d.p+'</b><span class="meta">'+(lang==="he"?"דלת כנף":"Hinged Door")+'</span></div>'; });
       html += '</div></div>';
     });
     html += '</div>';
@@ -746,8 +745,8 @@
 
   function renderSchedule(){
     var timeline = [
-      {name:"PRJ-101", start:5, len:55, warn:false},{name:"PRJ-104", start:15, len:40, warn:true},
-      {name:"PRJ-108", start:0, len:70, warn:false},{name:"PRJ-112", start:60, len:30, warn:false},{name:"PRJ-119", start:35, len:20, warn:true}
+      {name:"PRJ-2401", start:5, len:55, warn:false},{name:"PRJ-2402", start:15, len:40, warn:true},
+      {name:"PRJ-2403", start:0, len:70, warn:false},{name:"PRJ-2405", start:60, len:20, warn:false},{name:"PRJ-2404", start:35, len:20, warn:true}
     ];
     var html = '<div class="card gantt"><h3 style="font-size:13px; margin-bottom:10px;">'+ (lang==="he"?"ציר זמן פרויקטים":"Project Timeline") +'</h3><div id="ganttRows"></div></div>' +
       '<div class="card" style="padding:15px;"><h3 style="font-size:13px; margin-bottom:10px;">'+(lang==="he"?"שיבוץ צוותי שטח — השבוע":"Field-Team Assignment — This Week")+'</h3><div class="table-wrap"><div class="week-grid" id="weekGrid"></div></div></div>';
@@ -760,17 +759,17 @@
     });
     var days = lang==="he" ? ["א","ב","ג","ד","ה"] : ["Mon","Tue","Wed","Thu","Fri"];
     var teams = lang==="he" ? ["צוות אלפא","צוות צפון","צוות דרום"] : ["Team Alpha","Team North","Team South"];
-    var assignments = { 0:["PRJ-101","PRJ-101","","PRJ-108","PRJ-108"], 1:["","PRJ-104","PRJ-104","","PRJ-115"], 2:["PRJ-119","","PRJ-119","PRJ-112",""] };
+    var assignments = { 0:["PRJ-2401","PRJ-2401","","PRJ-2403","PRJ-2403"], 1:["","PRJ-2402","PRJ-2402","","PRJ-2405"], 2:["PRJ-2404","","PRJ-2404","PRJ-2404",""] };
     var wg = document.getElementById("weekGrid");
     wg.innerHTML = '<div class="wh"></div>' + days.map(function(d){ return '<div class="wh">'+d+'</div>'; }).join("");
     teams.forEach(function(team,ti){
       wg.innerHTML += '<div>'+team+'</div>';
-      assignments[ti].forEach(function(v){ var warn=v==="PRJ-119"; wg.innerHTML += '<div>' + (v ? '<span class="assign-chip'+(warn?" warn":"")+'">'+v+'</span>' : "") + '</div>'; });
+      assignments[ti].forEach(function(v){ var warn=v==="PRJ-2404"; wg.innerHTML += '<div>' + (v ? '<span class="assign-chip'+(warn?" warn":"")+'">'+v+'</span>' : "") + '</div>'; });
     });
   }
 
   function renderWarehouse(){
-    var stock = [["CA-2400","Component A — 240cm",34,20],["CB-1800","Component B — 180cm",12,15],["CC-STD","Component C — Standard",8,10],["SA-STD","Sub-Assembly A",3,4],["CD-50","Component D — 50mm",61,40]];
+    var stock = [["WP-2400","Wall Panel — 240cm",34,20],["RP-1800","Roof Panel — 180cm",12,15],["CP-STD","Corner Post — Standard",8,10],["HD-STD","Hinged Door Assembly",3,4],["INS-50","Insulation Sheet — 50mm",61,40]];
     var po = [["PO-3311","Supplier A","Sent",4],["PO-3312","Supplier B","Confirmed",7],["PO-3313","Supplier A","Draft",2],["PO-3314","Supplier C","Partially Received",5]];
     var poStatusMap = {he:{"Sent":"נשלחה","Confirmed":"אושרה","Draft":"טיוטה","Partially Received":"חלקית הגיעה"}};
     var low = stock.filter(function(s){ return s[2] < s[3]; }).length;
@@ -794,7 +793,9 @@
     var depts = lang==="he" ?
       [["ייצור",18,20],["מחסן",6,6],["התקנת שטח",9,10],["הנהלה",4,4]] :
       [["Production",18,20],["Warehouse",6,6],["Field Installation",9,10],["Administration",4,4]];
-    var roles = lang==="he" ? ["מפעיל קו","ראש משמרת","טכנאי שטח","פקיד מחסן"] : ["Line Operator","Shift Lead","Field Technician","Warehouse Clerk"];
+    var people = lang==="he" ?
+      [["דנה כהן","מפעילת קו"],["יוסי לוי","ראש משמרת"],["מיכל אברהם","טכנאית שטח"],["אבי פרץ","פקיד מחסן"]] :
+      [["Dana Cohen","Line Operator"],["Yossi Levy","Shift Lead"],["Michal Avraham","Field Technician"],["Avi Peretz","Warehouse Clerk"]];
     var days = lang==="he" ? ["א","ב","ג","ד","ה"] : ["Mon","Tue","Wed","Thu","Fri"];
     var att = [[1,1,1,1,0],[1,1,1,1,1],[1,0,1,1,1],[1,1,1,0,1]];
     var html = '<div class="card" style="margin-bottom:14px;"><div style="padding:13px 15px 0;"><h2 style="font-size:14.5px;">'+t("hr.staffing")+'</h2></div><div class="table-wrap"><table class="dt"><thead><tr><th>'+t("hr.dept")+'</th><th class="num">'+t("hr.today")+'</th><th class="num">'+t("hr.target")+'</th><th></th></tr></thead><tbody>';
@@ -803,9 +804,9 @@
       html += '<tr><td>'+d[0]+'</td><td class="num">'+d[1]+'</td><td class="num">'+d[2]+'</td><td>'+(short?'<span class="pill warn">'+(lang==="he"?"מחסור":"Understaffed")+'</span>':'<span class="pill good">'+(lang==="he"?"תקין":"OK")+'</span>')+'</td></tr>';
     });
     html += '</tbody></table></div></div>' +
-      '<div class="card"><div style="padding:13px 15px 0;"><h2 style="font-size:14.5px;">'+t("hr.calendar")+'</h2></div><div class="table-wrap"><table class="dt"><thead><tr><th>'+(lang==="he"?"תפקיד":"Role")+'</th>'+days.map(function(d){return '<th class="num">'+d+'</th>';}).join("")+'</tr></thead><tbody>';
-    roles.forEach(function(r,ri){
-      html += '<tr><td>'+r+'</td>'+att[ri].map(function(v){ return '<td class="num">'+(v? '<span class="pill good" style="padding:2px 8px;">✓</span>' : '<span class="pill neutral" style="padding:2px 8px;">—</span>')+'</td>'; }).join("")+'</tr>';
+      '<div class="card"><div style="padding:13px 15px 0;"><h2 style="font-size:14.5px;">'+t("hr.calendar")+'</h2></div><div class="table-wrap"><table class="dt"><thead><tr><th>'+(lang==="he"?"עובד":"Employee")+'</th>'+days.map(function(d){return '<th class="num">'+d+'</th>';}).join("")+'</tr></thead><tbody>';
+    people.forEach(function(p,ri){
+      html += '<tr><td><b>'+p[0]+'</b><br><span style="color:var(--text-faint); font-size:11px;">'+p[1]+'</span></td>'+att[ri].map(function(v){ return '<td class="num">'+(v? '<span class="pill good" style="padding:2px 8px;">✓</span>' : '<span class="pill neutral" style="padding:2px 8px;">—</span>')+'</td>'; }).join("")+'</tr>';
     });
     html += '</tbody></table></div></div>';
     host.innerHTML = html;
@@ -813,10 +814,10 @@
 
   function renderInvoices(){
     var rows = [
-      ["PRJ-101", lang==="he"?"מקדמה":"Upfront", lang==="he"?"מיידי":"Immediate", "₪42,000", "good", lang==="he"?"שולמה":"Paid"],
-      ["PRJ-101", lang==="he"?"אחרי ייצור":"On Production", lang==="he"?"מוכנות ייצור":"Production Ready", "₪63,000", "warn", lang==="he"?"בשלה — לחייב!":"Matured — bill now!"],
-      ["PRJ-108", lang==="he"?"אחרי התקנה":"On Installation", lang==="he"?"סיום התקנה":"Installation Complete", "₪55,000", "accent", lang==="he"?"נשלחה":"Sent"],
-      ["PRJ-119", lang==="he"?"בסיום":"On Completion", lang==="he"?"סגירת פרויקט":"Project Closeout", "₪28,000", "neutral", lang==="he"?"ממתין":"Waiting"]
+      ["PRJ-2401", lang==="he"?"מקדמה":"Upfront", lang==="he"?"מיידי":"Immediate", "₪42,000", "good", lang==="he"?"שולמה":"Paid"],
+      ["PRJ-2401", lang==="he"?"אחרי ייצור":"On Production", lang==="he"?"מוכנות ייצור":"Production Ready", "₪63,000", "warn", lang==="he"?"בשלה — לחייב!":"Matured — bill now!"],
+      ["PRJ-2403", lang==="he"?"אחרי התקנה":"On Installation", lang==="he"?"סיום התקנה":"Installation Complete", "₪55,000", "accent", lang==="he"?"נשלחה":"Sent"],
+      ["PRJ-2404", lang==="he"?"בסיום":"On Completion", lang==="he"?"סגירת פרויקט":"Project Closeout", "₪28,000", "neutral", lang==="he"?"ממתין":"Waiting"]
     ];
     var html = '<div class="card"><div class="table-wrap"><table class="dt"><thead><tr><th>'+t("inv.project")+'</th><th>'+t("inv.milestone")+'</th><th>'+t("inv.trigger")+'</th><th class="num">'+t("inv.amount")+'</th><th>'+t("inv.status")+'</th></tr></thead><tbody>';
     rows.forEach(function(r){ html += '<tr><td class="num">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="num">'+r[3]+'</td><td><span class="pill '+r[4]+'">'+r[5]+'</span></td></tr>'; });
@@ -826,7 +827,7 @@
 
   function renderLogistics(){
     var vehicles = [["V-01","Van","2022","2026-10-02","good"],["V-02","Truck","2020","2026-09-01","warn"],["V-03","Van","2023","2027-01-15","good"]];
-    var procs = [[lang==="he"?"בטיחות — הפעלת מלגזה":"Safety — Forklift Operation","1.3"],[lang==="he"?"איכות — בדיקת רכיבים":"Quality — Component Inspection","2.1"],[lang==="he"?"רכש — אישור ספק":"Procurement — Supplier Approval","1.0"]];
+    var procs = [[lang==="he"?"בטיחות — הפעלת מלגזה":"Safety — Forklift Operation","1.3"],[lang==="he"?"איכות — בדיקת פאנלים":"Quality — Panel Inspection","2.1"],[lang==="he"?"רכש — אישור ספק":"Procurement — Supplier Approval","1.0"]];
     var html = '<div class="section-head"><h2 style="font-size:14.5px;">'+t("lg.fleet")+'</h2></div><div class="card-grid" style="margin-bottom:16px;">';
     vehicles.forEach(function(v){
       html += '<div class="card mini-card"><div class="mini-card-head"><b>'+v[0]+'</b><span class="pill '+v[4]+'">'+t("lg.expiry")+'</span></div>' +
@@ -839,9 +840,9 @@
   }
 
   function renderTasks(){
-    var cols = [["tasks.open",[["Replace cutting blade — Station 2","urgent"],["Order raw material stock","normal"]]],
-      ["tasks.progress",[["Confirm delivery window — PRJ-108","normal"],["Calibrate forming press","normal"]]],
-      ["tasks.done",[["Weekly safety walk-through","normal"],["Restock Component C bin","normal"]]]];
+    var cols = [["tasks.open",[["Replace cutting blade — Station 2","urgent"],["Order insulation stock","normal"]]],
+      ["tasks.progress",[["Confirm delivery window — PRJ-2403","normal"],["Calibrate bending press","normal"]]],
+      ["tasks.done",[["Weekly safety walk-through","normal"],["Restock corner post bin","normal"]]]];
     var html = '<div class="kanban">';
     cols.forEach(function(c){
       html += '<div class="kb-col"><div class="kb-col-head"><b>'+t(c[0])+'</b> <span class="count num">'+c[1].length+'</span></div><div class="kb-col-body">';
