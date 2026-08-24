@@ -56,12 +56,10 @@
   a{ color:var(--accent-strong); }
   :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
 
-  .app{ display:grid; grid-template-columns:1fr 208px; min-height:100vh; }
-  html[dir="ltr"] .app{ grid-template-columns:208px 1fr; }
+  .app{ display:grid; grid-template-columns:208px 1fr; min-height:100vh; }
   @media (max-width: 900px){ .app{ grid-template-columns:1fr; } .rail{ display:none; } .topbar-tabs{ display:flex; } }
 
-  .rail{ background:var(--bg-2); border-inline-start:1px solid var(--border); padding:16px 12px; display:flex; flex-direction:column; gap:16px; position:sticky; top:0; height:100vh; grid-column:2; }
-  html[dir="ltr"] .rail{ grid-column:1; border-inline-start:none; border-inline-end:1px solid var(--border); }
+  .rail{ background:var(--bg-2); border-inline-end:1px solid var(--border); padding:16px 12px; display:flex; flex-direction:column; gap:16px; position:sticky; top:0; height:100vh; }
   .brand{ display:flex; align-items:center; gap:9px; padding:2px 4px 12px; border-bottom:1px solid var(--border); cursor:pointer; background:none; border-inline:none; border-top:none; width:100%; text-align:start; }
   .brand-mark{ width:32px;height:32px;border-radius:9px; background:linear-gradient(155deg, var(--accent), var(--purple)); display:flex;align-items:center;justify-content:center; color:#fff; font-weight:800; font-size:14px; flex:none; }
   .brand-text{ display:flex; flex-direction:column; line-height:1.2; }
@@ -80,8 +78,7 @@
   .demo-pill{ display:flex; align-items:flex-start; gap:7px; background:var(--warn-soft); color:var(--warn); border-radius:var(--radius-s); padding:8px 9px; font-size:10.5px; line-height:1.4; }
   .demo-pill b{ display:block; font-size:10.5px; }
 
-  .main{ min-width:0; grid-column:1; }
-  html[dir="ltr"] .main{ grid-column:2; }
+  .main{ min-width:0; }
   .topbar{ background:var(--bg-2); border-bottom:1px solid var(--border); padding:12px 20px; display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; }
   .topbar-left{ display:flex; align-items:center; gap:8px; }
   .icon-btn{ width:32px; height:32px; border-radius:8px; background:var(--surface); border:1px solid var(--border); color:var(--text-muted); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:14px; }
