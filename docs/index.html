@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopFloor Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#F5F7FB;
+    --surface:#FFFFFF;
+    --surface-2:#EEF2F8;
+    --surface-3:#E2E9F3;
+    --border:#DCE3ED;
+    --text:#182233;
+    --text-muted:#5B6779;
+    --text-faint:#8992A3;
+
+    --accent:#2563EB;
+    --accent-strong:#1E40AF;
+    --accent-soft:#E9F0FE;
+    --accent-ink:#1E3A8A;
+
+    --good:#2F8F5B;
+    --good-soft:#E4F5EC;
+    --warn:#C97A22;
+    --warn-soft:#FCEEDC;
+    --crit:#C13B2E;
+    --crit-soft:#FBE6E2;
+    --neutral-chip:#E7EAEE;
+    --neutral-chip-ink:#4C5563;
+
+    --grid-line: rgba(37,99,235,0.09);
+    --shadow: 0 1px 2px rgba(20,30,40,0.06), 0 8px 24px -12px rgba(20,30,40,0.14);
+    --font-body:'Heebo','Segoe UI',sans-serif;
+    --radius-s:6px; --radius-m:10px; --radius-l:16px;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#0E1420; --surface:#151D2B; --surface-2:#1B2434; --surface-3:#253043;
+      --border:#2B3752; --text:#E7ECF7; --text-muted:#9AA6BC; --text-faint:#6C789A;
+      --accent:#6C93F5; --accent-strong:#9DB8FA; --accent-soft:rgba(108,147,245,0.16); --accent-ink:#CBDBFC;
+      --good:#4FBE85; --good-soft:rgba(79,190,133,0.14);
+      --warn:#E2993D; --warn-soft:rgba(226,153,61,0.14);
+      --crit:#E2594A; --crit-soft:rgba(226,89,74,0.14);
+      --neutral-chip:#25304A; --neutral-chip-ink:#AEB8CC;
+      --grid-line: rgba(108,147,245,0.10);
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -12px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#0E1420; --surface:#151D2B; --surface-2:#1B2434; --surface-3:#253043;
+    --border:#2B3752; --text:#E7ECF7; --text-muted:#9AA6BC; --text-faint:#6C7A9A;
+    --accent:#6C93F5; --accent-strong:#9DB8FA; --accent-soft:rgba(108,147,245,0.16); --accent-ink:#CBDBFC;
+    --good:#4FBE85; --good-soft:rgba(79,190,133,0.14);
+    --warn:#E2993D; --warn-soft:rgba(226,153,61,0.14);
+    --crit:#E2594A; --crit-soft:rgba(226,89,74,0.14);
+    --neutral-chip:#25304A; --neutral-chip-ink:#AEB8CC;
+    --grid-line: rgba(108,147,245,0.10);
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -12px rgba(0,0,0,0.55);
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:var(--font-body); font-size:14px; line-height:1.5; overflow-x:hidden; }
+  h1,h2,h3{ font-family:var(--font-body); font-weight:800; text-wrap:balance; margin:0; }
+  button{ font-family:inherit; }
+  table{ border-collapse:collapse; width:100%; }
+  .num{ font-variant-numeric:tabular-nums; }
+  a{ color:var(--accent-strong); }
+  :focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+
+  .app{ display:grid; grid-template-columns:210px 1fr; min-height:100vh; }
+  @media (max-width: 860px){ .app{ grid-template-columns:1fr; } .rail{ display:none; } .topbar-tabs{ display:flex; } }
+
+  .rail{ background:var(--surface); border-inline-end:1px solid var(--border); padding:18px 12px; display:flex; flex-direction:column; gap:18px; position:sticky; top:0; height:100vh; }
+  .brand{ display:flex; align-items:center; gap:10px; padding:2px 6px 10px; border-bottom:1px solid var(--border); cursor:pointer; background:none; border-inline:none; border-top:none; width:100%; text-align:start; }
+  .brand-mark{ width:30px;height:30px;border-radius:8px; background:linear-gradient(150deg, var(--accent), var(--accent-strong)); display:flex;align-items:center;justify-content:center; color:#fff; font-weight:800; font-size:15px; flex:none; }
+  .brand-text{ display:flex; flex-direction:column; line-height:1.15; }
+  .brand-text b{ font-weight:800; font-size:16px; }
+  .brand-text span{ font-size:10px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.6px; }
+
+  .nav{ display:flex; flex-direction:column; gap:2px; }
+  .nav-group-label{ font-size:10px; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-faint); font-weight:700; padding:10px 10px 4px; }
+  .nav-btn{ display:flex; align-items:center; gap:9px; background:none; border:1px solid transparent; text-align:start; padding:8px 10px; border-radius:var(--radius-s); color:var(--text-muted); font-size:13px; font-weight:500; cursor:pointer; width:100%; }
+  .nav-btn .ico{ width:16px; text-align:center; flex:none; }
+  .nav-btn:hover{ background:var(--surface-2); color:var(--text); }
+  .nav-btn[aria-current="true"]{ background:var(--accent-soft); color:var(--accent-ink); font-weight:700; }
+
+  .rail-foot{ margin-top:auto; padding-top:12px; border-top:1px solid var(--border); }
+  .demo-pill{ display:flex; align-items:flex-start; gap:7px; background:var(--warn-soft); color:var(--warn); border-radius:var(--radius-s); padding:8px 9px; font-size:11px; line-height:1.4; }
+  .demo-pill b{ display:block; font-size:11px; }
+
+  .main{ min-width:0; }
+  .topbar{ position:sticky; top:0; z-index:5; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(6px); border-bottom:1px solid var(--border); padding:13px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .topbar-title{ display:flex; flex-direction:column; gap:1px; }
+  .topbar-title h1{ font-size:19px; }
+  .topbar-title p{ margin:0; font-size:11.5px; color:var(--text-muted); }
+  .topbar-tabs{ display:none; gap:6px; overflow-x:auto; }
+  .topbar-tabs button{ flex:none; background:var(--surface-2); border:1px solid var(--border); color:var(--text-muted); padding:6px 10px; border-radius:999px; font-size:11.5px; cursor:pointer; }
+  .topbar-actions{ display:flex; align-items:center; gap:10px; }
+  .lang-toggle{ display:flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; background:var(--surface); }
+  .lang-toggle button{ border:none; background:none; padding:6px 11px; font-size:11.5px; font-weight:600; color:var(--text-muted); cursor:pointer; }
+  .lang-toggle button[aria-pressed="true"]{ background:var(--accent); color:#fff; }
+
+  .view{ display:none; padding:20px; max-width:1240px; margin:0 auto; }
+  .view[data-active="true"]{ display:block; }
+
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap; }
+  .section-head h2{ font-size:18px; }
+  .section-head .hint{ font-size:11.5px; color:var(--text-faint); }
+  .back-link{ background:none; border:none; color:var(--accent-strong); font-size:12.5px; font-weight:600; cursor:pointer; padding:0 0 10px; display:inline-flex; align-items:center; gap:5px; }
+
+  .card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-l); box-shadow:var(--shadow); }
+
+  .pill{ display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .pill::before{ content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+  .pill.good{ background:var(--good-soft); color:var(--good); }
+  .pill.warn{ background:var(--warn-soft); color:var(--warn); }
+  .pill.crit{ background:var(--crit-soft); color:var(--crit); }
+  .pill.neutral{ background:var(--neutral-chip); color:var(--neutral-chip-ink); }
+  .pill.accent{ background:var(--accent-soft); color:var(--accent-ink); }
+
+  .progress{ height:6px; border-radius:99px; background:var(--surface-3); overflow:hidden; }
+  .progress > span{ display:block; height:100%; background:linear-gradient(90deg, var(--accent), var(--accent-strong)); border-radius:99px; }
+
+  /* Home */
+  .home-hero{ padding:26px 4px 22px; }
+  .home-hero h1{ font-size:26px; margin-bottom:6px; }
+  .home-hero p{ color:var(--text-muted); font-size:13.5px; max-width:60ch; }
+  .home-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media (max-width:820px){ .home-grid{ grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .home-grid{ grid-template-columns:1fr;} }
+  .home-tile{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-l); box-shadow:var(--shadow); padding:18px; text-align:start; cursor:pointer; display:flex; flex-direction:column; gap:10px; }
+  .home-tile:hover{ border-color:var(--accent); transform:translateY(-1px); transition:transform .15s ease; }
+  .home-tile .ico{ width:38px; height:38px; border-radius:10px; background:var(--accent-soft); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .home-tile b{ font-size:14.5px; }
+  .home-tile span{ font-size:12px; color:var(--text-faint); line-height:1.4; }
+
+  /* KPI */
+  .kpi-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+  @media (max-width:760px){ .kpi-row{ grid-template-columns:repeat(2,1fr);} }
+  .kpi{ padding:15px 15px 13px; display:flex; flex-direction:column; gap:7px; }
+  .kpi .label{ font-size:11px; text-transform:uppercase; letter-spacing:0.5px; color:var(--text-faint); font-weight:600; }
+  .kpi .value{ font-size:29px; font-weight:800; line-height:1; }
+  .kpi .value small{ font-size:12.5px; color:var(--text-faint); font-weight:600; }
+  .kpi .delta{ font-size:11px; color:var(--good); font-weight:600; }
+  .kpi .delta.down{ color:var(--crit); }
+
+  .dash-grid{ display:grid; grid-template-columns:1.5fr 1fr; gap:14px; align-items:start; }
+  @media (max-width:900px){ .dash-grid{ grid-template-columns:1fr; } }
+
+  .proj-list{ display:flex; flex-direction:column; }
+  .proj-row{ display:grid; grid-template-columns:1.4fr 0.9fr 1fr 84px; gap:12px; align-items:center; padding:11px 15px; border-top:1px solid var(--border); cursor:pointer; }
+  .proj-row:first-child{ border-top:none; }
+  .proj-row:hover{ background:var(--surface-2); }
+  .proj-name{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .proj-name b{ font-size:13px; }
+  .proj-name span{ font-size:11px; color:var(--text-faint); }
+  .proj-row .pct{ font-size:11.5px; text-align:end; color:var(--text-muted); }
+
+  .table-wrap{ overflow-x:auto; }
+  .chart-card{ padding:15px; }
+  .bars{ display:flex; align-items:flex-end; gap:7px; height:110px; margin-top:12px; }
+  .bars .bar{ flex:1; background:var(--surface-3); border-radius:5px 5px 2px 2px; position:relative; }
+  .bars .bar > span{ position:absolute; inset-inline:0; bottom:0; border-radius:5px 5px 2px 2px; background:linear-gradient(180deg, var(--accent-strong), var(--accent)); }
+  .bars-labels{ display:flex; gap:7px; margin-top:5px; }
+  .bars-labels span{ flex:1; text-align:center; font-size:9.5px; color:var(--text-faint); }
+
+  .attn-list{ display:flex; flex-direction:column; gap:8px; padding:13px; }
+  .attn-item{ display:flex; align-items:flex-start; gap:8px; font-size:12px; }
+  .attn-item .dot{ width:7px; height:7px; border-radius:50%; margin-top:5px; flex:none; }
+  .attn-item .dot.crit{ background:var(--crit); }
+  .attn-item .dot.warn{ background:var(--warn); }
+  .attn-item b{ display:block; }
+  .attn-item span{ color:var(--text-faint); font-size:11px; }
+
+  /* Generic data table */
+  table.dt th{ text-align:start; font-size:10.5px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-faint); padding:9px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+  table.dt td{ padding:10px 14px; border-bottom:1px solid var(--border); font-size:12.5px; }
+  table.dt tr:last-child td{ border-bottom:none; }
+  table.dt td.num, table.dt th.num{ text-align:end; }
+
+  /* Room detail (project drilldown) */
+  .info-bar{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--border); border:1px solid var(--border); border-radius:var(--radius-m); overflow:hidden; margin-bottom:16px; }
+  @media (max-width:700px){ .info-bar{ grid-template-columns:repeat(2,1fr);} }
+  .info-cell{ background:var(--surface); padding:11px 14px; }
+  .info-cell .k{ font-size:10.5px; color:var(--text-faint); text-transform:uppercase; letter-spacing:0.4px; margin-bottom:3px; }
+  .info-cell .v{ font-size:13.5px; font-weight:700; }
+  .room-block{ margin-bottom:14px; }
+  .room-block-head{ display:flex; align-items:center; justify-content:space-between; padding:11px 15px; background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-m) var(--radius-m) 0 0; }
+  .room-block-head b{ font-size:13.5px; }
+  .room-block .card{ border-radius:0 0 var(--radius-m) var(--radius-m); border-top:none; }
+
+  /* Drafting */
+  .draft-grid{ display:grid; grid-template-columns:1.1fr 1fr; gap:16px; align-items:start; }
+  @media (max-width:900px){ .draft-grid{ grid-template-columns:1fr; } }
+  .preset-row{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .preset-btn{ background:var(--surface); border:1px solid var(--border); color:var(--text-muted); padding:8px 13px; border-radius:var(--radius-s); font-size:12px; font-weight:600; cursor:pointer; }
+  .preset-btn[aria-pressed="true"]{ background:var(--accent); border-color:var(--accent); color:#fff; }
+  .canvas-card{ padding:15px; }
+  .canvas-frame{ background: linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0/24px 24px, linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0/24px 24px, var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-m); padding:10px; }
+  .canvas-frame svg{ width:100%; height:auto; display:block; }
+  .wall-label{ font-size:11px; fill:var(--text-muted); }
+  .room-fill{ fill:var(--accent-soft); }
+  .wall-line{ stroke:var(--accent-strong); stroke-width:3; }
+  .corner-dot{ fill:var(--accent-strong); }
+  .door-arc{ stroke:var(--warn); stroke-width:1.6; fill:none; stroke-dasharray:3 3; }
+  .door-leaf{ stroke:var(--warn); stroke-width:2.4; }
+  .bom-card{ padding:0; overflow:hidden; }
+  .bom-head{ padding:13px 15px 9px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:baseline; }
+  .bom-head h3{ font-size:14.5px; }
+  .bom-total{ font-size:15px; font-weight:800; color:var(--accent-strong); }
+
+  /* Kanban (shared: floor, doors, tasks) */
+  .filter-row{ display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+  .filter-btn{ background:var(--surface); border:1px solid var(--border); color:var(--text-muted); padding:6px 12px; border-radius:999px; font-size:11.5px; font-weight:600; cursor:pointer; }
+  .filter-btn[aria-pressed="true"]{ background:var(--text); border-color:var(--text); color:var(--bg); }
+  .kanban{ display:grid; grid-auto-flow:column; grid-auto-columns:210px; gap:12px; overflow-x:auto; padding-bottom:10px; }
+  .kb-col{ background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-m); display:flex; flex-direction:column; min-height:110px; }
+  .kb-col-head{ padding:10px 12px 8px; border-bottom:1px dashed var(--border); }
+  .kb-col-head b{ font-size:11.5px; }
+  .kb-col-head .count{ font-size:11px; color:var(--text-faint); }
+  .kb-col-body{ padding:9px; display:flex; flex-direction:column; gap:8px; }
+  .kb-card{ background:var(--surface); border:1px solid var(--border); border-radius:var(--radius-s); padding:9px 10px; box-shadow:var(--shadow); }
+  .kb-card[data-hidden="true"]{ display:none; }
+  .kb-card b{ display:block; font-size:12px; margin-bottom:3px; }
+  .kb-card .meta{ font-size:10.5px; color:var(--text-faint); margin-bottom:6px; }
+
+  /* Scheduling */
+  .gantt{ padding:15px; margin-bottom:16px; }
+  .gantt-row{ display:grid; grid-template-columns:110px 1fr; align-items:center; gap:10px; padding:6px 0; }
+  .gantt-row .label{ font-size:11.5px; color:var(--text-muted); }
+  .gantt-track{ position:relative; height:20px; background:var(--surface-2); border-radius:5px; }
+  .gantt-bar{ position:absolute; top:2px; bottom:2px; border-radius:4px; background:linear-gradient(90deg, var(--accent-strong), var(--accent)); }
+  .gantt-bar.warn{ background:linear-gradient(90deg, var(--warn), #e2a75f); }
+  .week-grid{ display:grid; grid-template-columns:100px repeat(5,1fr); border:1px solid var(--border); border-radius:var(--radius-m); overflow:hidden; }
+  .week-grid > div{ padding:9px; border-bottom:1px solid var(--border); border-inline-start:1px solid var(--border); font-size:11.5px; }
+  .week-grid > div:nth-child(6n+1){ border-inline-start:none; background:var(--surface-2); font-weight:700; }
+  .week-grid > .wh{ background:var(--surface-2); font-weight:700; font-size:10px; text-transform:uppercase; letter-spacing:0.4px; color:var(--text-faint); }
+  .assign-chip{ display:inline-block; background:var(--accent-soft); color:var(--accent-ink); border-radius:5px; padding:4px 7px; font-size:10.5px; margin:2px 0; }
+  .assign-chip.warn{ background:var(--warn-soft); color:var(--warn); }
+
+  /* Warehouse / HR / Logistics grids */
+  .card-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  @media (max-width:820px){ .card-grid{ grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:560px){ .card-grid{ grid-template-columns:1fr;} }
+  .mini-card{ padding:14px; display:flex; flex-direction:column; gap:8px; }
+  .mini-card-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+  .mini-card-head b{ font-size:13px; }
+  .mini-card .row{ display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-muted); }
+  .stat-strip{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
+  .stat-chip{ background:var(--surface-2); border:1px solid var(--border); border-radius:var(--radius-s); padding:8px 12px; font-size:11.5px; display:flex; flex-direction:column; gap:2px; min-width:100px; }
+  .stat-chip b{ font-size:16px; }
+
+  footer.foot{ text-align:center; padding:24px 20px 40px; font-size:11px; color:var(--text-faint); }
+</style>
+
+</head>
+<body>
+<div class="app">
+  <aside class="rail">
+    <button class="brand" id="homeBtn">
+      <span class="brand-mark">SC</span>
+      <span class="brand-text"><b>ShopFloor</b><span data-i18n="brand.sub">קונסולה — דמו</span></span>
+    </button>
+    <nav class="nav" id="nav"></nav>
+    <div class="rail-foot">
+      <div class="demo-pill">
+        <span><b data-i18n="demo.title">דמו לצפייה בלבד</b><span data-i18n="demo.body">נתונים בדיוניים. אין שרת אמיתי — שום דבר לא נשמר.</span></span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1 id="pageTitle">—</h1>
+        <p id="pageSub">—</p>
+      </div>
+      <div class="topbar-tabs" id="topbarTabs"></div>
+      <div class="topbar-actions">
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button id="langHe" aria-pressed="true">עברית</button>
+          <button id="langEn" aria-pressed="false">EN</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="viewHost"></div>
+
+    <footer class="foot" data-i18n="footer.note">פרוטוטייפ אינטראקטיבי לתיק עבודות — נבנה מחדש באופן עצמאי עם נתונים בדיוניים בלבד. לא מחובר לשום מערכת אמיתית.</footer>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ================= i18n ================= */
+  var dict = {
+    "brand.sub":["קונסולה — דמו","Console — Demo"],
+    "demo.title":["דמו לצפייה בלבד","Read-only demo"],
+    "demo.body":["נתונים בדיוניים. אין שרת אמיתי — שום דבר לא נשמר.","Fictional data. No live backend — nothing here is saved."],
+    "footer.note":["פרוטוטייפ אינטראקטיבי לתיק עבודות — נבנה מחדש באופן עצמאי עם נתונים בדיוניים בלבד. לא מחובר לשום מערכת אמיתית.","Interactive portfolio prototype — recreated independently with fictional data only. Not connected to any real system."],
+    "back":["חזרה לדף הבית","Back to home"],
+
+    "home.title":["מערכת ניהול תפעולי","Operational Management System"],
+    "home.sub":["דמו אינטראקטיבי — כל הנתונים בדיוניים. בחרו מודול כדי להתחיל.","Interactive demo — all data is fictional. Choose a module to begin."],
+    "home.production":["בקרת ייצור והתקנה","Production & Installation"],
+    "home.production.d":["פרויקטים, רצפת ייצור, שרטוט אוטומטי, מעקב תת-הרכבה ושיבוץ צוותים","Projects, production floor, automatic drafting, sub-assembly tracking, team scheduling"],
+    "home.warehouse":["מלאי ורכש","Warehouse & Procurement"],
+    "home.warehouse.d":["מלאי חומרי גלם, ספקים והזמנות רכש","Raw materials, suppliers, purchase orders"],
+    "home.hr":["כוח אדם","HR"],
+    "home.hr.d":["נוכחות, שיבוץ משמרות ותקן מחלקתי","Attendance, shift scheduling, department staffing"],
+    "home.invoices":["בקרת חשבוניות","Invoice Control"],
+    "home.invoices.d":["אבני דרך לתשלום ומעקב חשבוניות","Payment milestones and invoice tracking"],
+    "home.logistics":["לוגיסטיקה","Logistics"],
+    "home.logistics.d":["רכבים, נהלים ורגולציה עם התראות תוקף","Vehicles, procedures, and regulatory expiry alerts"],
+    "home.tasks":["משימות ותקלות","Tasks"],
+    "home.tasks.d":["לוח קנבן ומשימות שגרתיות","Kanban board and recurring routines"],
+
+    "nav.dashboard":["לוח בקרה","Dashboard"],
+    "nav.project":["פרטי פרויקט","Project Detail"],
+    "nav.drafting":["שרטוט וכתב כמויות","Drafting & BOM"],
+    "nav.floor":["רצפת ייצור","Production Floor"],
+    "nav.doors":["מעקב תת-הרכבה","Sub-Assembly Board"],
+    "nav.schedule":["שיבוץ ולו״ז","Scheduling"],
+    "navgroup.production":["ייצור","Production"],
+
+    "title.dashboard":["לוח בקרה","Dashboard"],
+    "sub.dashboard":["תמונת מצב חיה של כל הפרויקטים הפעילים","Live overview across every active project"],
+    "title.project":["PRJ-101 · פרטי פרויקט","PRJ-101 · Project Detail"],
+    "sub.project":["חדרים, רכיבים וסטטוס ייצור","Rooms, components, and production status"],
+    "title.drafting":["שרטוט וכתב כמויות","Drafting & BOM"],
+    "sub.drafting":["משרטוט לכתב כמויות, אוטומטית","From floor plan to bill of materials, automatically"],
+    "title.floor":["רצפת ייצור","Production Floor"],
+    "sub.floor":["סטטוס רכיבים לאורך כל תחנות הייצור","Component status across every production station"],
+    "title.doors":["מעקב תת-הרכבה","Sub-Assembly Board"],
+    "sub.doors":["מדידה בשטח → ייצור → התקנה","On-site measurement → manufacturing → installation"],
+    "title.schedule":["שיבוץ ולו״ז","Scheduling"],
+    "sub.schedule":["ציר זמן ושיבוץ צוותי שטח","Timeline and field-team assignment"],
+    "title.warehouse":["מלאי ורכש","Warehouse & Procurement"],
+    "sub.warehouse":["מלאי חי והזמנות רכש","Live stock and purchase orders"],
+    "title.hr":["כוח אדם","HR"],
+    "sub.hr":["נוכחות ותקן מחלקתי — ללא פרטים אישיים","Attendance and department staffing — no personal data"],
+    "title.invoices":["בקרת חשבוניות","Invoice Control"],
+    "sub.invoices":["אבני דרך לתשלום לפי סטטוס ייצור/התקנה","Payment milestones tied to production/installation status"],
+    "title.logistics":["לוגיסטיקה","Logistics"],
+    "sub.logistics":["רכבים ונהלים עם התראות תוקף","Vehicles and procedures with expiry alerts"],
+    "title.tasks":["משימות ותקלות","Tasks"],
+    "sub.tasks":["לוח קנבן ומשימות שגרתיות","Kanban board and recurring routines"],
+
+    "kpi.active":["פרויקטים פעילים","Active Projects"],
+    "kpi.active.d":["2+ החודש","+2 this month"],
+    "kpi.readiness":["מוכנות ממוצעת","Avg. Readiness"],
+    "kpi.readiness.d":["5+ נק' מהשבוע שעבר","+5 pts vs last week"],
+    "kpi.panels":["פאנלים יוצרו","Panels Produced"],
+    "kpi.panels.d":["בקצב ליעד","on pace for target"],
+    "kpi.urgent":["פריטים דחופים פתוחים","Open Urgent Items"],
+    "kpi.urgent.d":["דורש טיפול","needs attention"],
+    "dash.projects":["פרויקטים פעילים","Active Projects"],
+    "dash.projects.hint":["ממוין לפי תאריך אספקה · לחצו לפרטים","sorted by delivery date · click for detail"],
+    "dash.output":["תפוקה שבועית","Weekly Output"],
+    "dash.attention":["דורש תשומת לב","Needs Attention"],
+
+    "proj.delivery":["תאריך אספקה","Delivery Date"],
+    "proj.discount":["הנחה כללית","Global Discount"],
+    "proj.status":["סטטוס","Status"],
+    "proj.pricelist":["מחירון","Price List"],
+    "room.produced":["רכיב","Component"],
+    "room.qty":["יוצרו / נדרש","Produced / Required"],
+    "room.station":["תחנה","Station"],
+    "room.priority":["עדיפות","Priority"],
+
+    "draft.head":["שרטוט הנדסי","Engineering Drafting"],
+    "draft.hint":["כתב הכמויות מחושב אוטומטית מהשרטוט","bill of materials computes automatically from the drawing"],
+    "bom.title":["כתב כמויות אוטומטי","Auto-Generated BOM"],
+    "bom.component":["רכיב","Component"],
+    "bom.qty":["כמות","Qty"],
+    "bom.price":["סה״כ שורה","Line Total"],
+
+    "filter.all":["הכל","All"],
+    "filter.urgent":["דחוף","Urgent"],
+    "filter.normal":["רגיל","Normal"],
+    "preset.a":["חדר A · 4×3מ׳","Room A · 4×3m"],
+    "preset.b":["חדר B · צורת L","Room B · L-shape"],
+    "preset.c":["חדר C · 6×4מ׳","Room C · 6×4m"],
+
+    "wh.lowstock":["פריטים במלאי נמוך","Low Stock Items"],
+    "wh.openpo":["הזמנות פתוחות","Open Purchase Orders"],
+    "wh.stock":["מלאי","Stock"],
+    "wh.item":["פריט","Item"],
+    "wh.sku":["מק״ט","SKU"],
+    "wh.onhand":["במלאי","On Hand"],
+    "wh.min":["סף מינימום","Min Threshold"],
+    "wh.po":["הזמנות רכש","Purchase Orders"],
+    "wh.supplier":["ספק","Supplier"],
+    "wh.postatus":["סטטוס","Status"],
+
+    "hr.staffing":["תקן מול נוכחות","Staffing vs. Attendance"],
+    "hr.dept":["מחלקה","Department"],
+    "hr.today":["נוכחים היום","Present Today"],
+    "hr.target":["תקן","Target"],
+    "hr.calendar":["לוח נוכחות שבועי (לפי תפקיד)","Weekly Attendance (by role)"],
+
+    "inv.milestones":["אבני דרך לתשלום","Payment Milestones"],
+    "inv.project":["פרויקט","Project"],
+    "inv.milestone":["אבן דרך","Milestone"],
+    "inv.trigger":["טריגר","Trigger"],
+    "inv.amount":["סכום","Amount"],
+    "inv.status":["סטטוס","Status"],
+
+    "lg.fleet":["רכבים","Fleet"],
+    "lg.procedures":["נהלים","Procedures"],
+    "lg.expiry":["תוקף","Expiry"],
+    "lg.version":["גרסה","Version"],
+
+    "tasks.board":["לוח משימות","Task Board"],
+    "tasks.open":["פתוח","Open"],
+    "tasks.progress":["בתהליך","In Progress"],
+    "tasks.done":["הושלם","Done"],
+
+    "status.inprod":["בייצור","In Production"],
+    "status.await":["ממתין לחומרים","Awaiting Materials"],
+    "status.ready":["מוכן להתקנה","Ready for Install"],
+    "status.eng":["הנדסה","Engineering"],
+    "status.blocked":["חסום","Blocked"]
+  };
+  var lang = "he";
+  function t(k){ return (dict[k]||[k,k])[lang==="he"?0:1]; }
+  function applyI18n(){
+    document.querySelectorAll("[data-i18n]").forEach(function(el){ el.textContent = t(el.getAttribute("data-i18n")); });
+  }
+  function setLang(l){
+    lang = l;
+    var html = document.documentElement;
+    html.setAttribute("dir", l==="he" ? "rtl" : "ltr");
+    html.setAttribute("lang", l);
+    document.getElementById("langHe").setAttribute("aria-pressed", String(l==="he"));
+    document.getElementById("langEn").setAttribute("aria-pressed", String(l==="en"));
+    renderAll();
+  }
+  document.getElementById("langHe").addEventListener("click", function(){ setLang("he"); });
+  document.getElementById("langEn").addEventListener("click", function(){ setLang("en"); });
+
+  /* ================= Nav model ================= */
+  var HOME = [
+    {id:"production", ico:"🏭", key:"home.production"},
+    {id:"warehouse", ico:"📦", key:"home.warehouse"},
+    {id:"hr", ico:"👥", key:"home.hr"},
+    {id:"invoices", ico:"💳", key:"home.invoices"},
+    {id:"logistics", ico:"🚚", key:"home.logistics"},
+    {id:"tasks", ico:"✅", key:"home.tasks"}
+  ];
+  var PRODUCTION_TABS = [
+    {id:"dashboard", ico:"▦", key:"nav.dashboard"},
+    {id:"project", ico:"▣", key:"nav.project"},
+    {id:"drafting", ico:"✎", key:"nav.drafting"},
+    {id:"floor", ico:"☰", key:"nav.floor"},
+    {id:"doors", ico:"⛶", key:"nav.doors"},
+    {id:"schedule", ico:"▤", key:"nav.schedule"}
+  ];
+  var current = {module:"home", tab:null};
+
+  function goHome(){ current = {module:"home", tab:null}; renderAll(); }
+  document.getElementById("homeBtn").addEventListener("click", goHome);
+
+  function openModule(id){
+    if(id === "production"){ current = {module:"production", tab:"dashboard"}; }
+    else { current = {module:id, tab:null}; }
+    renderAll();
+  }
+  function openProdTab(id){ current = {module:"production", tab:id}; renderAll(); }
+
+  function renderNav(){
+    var nav = document.getElementById("nav");
+    nav.innerHTML = "";
+    if(current.module === "production"){
+      var back = document.createElement("button");
+      back.className = "nav-btn"; back.innerHTML = '<span class="ico">←</span><span>'+t("back")+'</span>';
+      back.addEventListener("click", goHome);
+      nav.appendChild(back);
+      var label = document.createElement("div");
+      label.className = "nav-group-label"; label.textContent = t("navgroup.production");
+      nav.appendChild(label);
+      PRODUCTION_TABS.forEach(function(tab){
+        var b = document.createElement("button");
+        b.className = "nav-btn";
+        b.setAttribute("aria-current", String(current.tab===tab.id));
+        b.innerHTML = '<span class="ico">'+tab.ico+'</span><span>'+t(tab.key)+'</span>';
+        b.addEventListener("click", function(){ openProdTab(tab.id); });
+        nav.appendChild(b);
+      });
+    } else if(current.module !== "home"){
+      var back2 = document.createElement("button");
+      back2.className = "nav-btn"; back2.innerHTML = '<span class="ico">←</span><span>'+t("back")+'</span>';
+      back2.addEventListener("click", goHome);
+      nav.appendChild(back2);
+      HOME.forEach(function(m){
+        var b = document.createElement("button");
+        b.className = "nav-btn";
+        b.setAttribute("aria-current", String(current.module===m.id));
+        b.innerHTML = '<span class="ico">'+m.ico+'</span><span>'+t(m.key)+'</span>';
+        b.addEventListener("click", function(){ openModule(m.id); });
+        nav.appendChild(b);
+      });
+    } else {
+      HOME.forEach(function(m){
+        var b = document.createElement("button");
+        b.className = "nav-btn";
+        b.setAttribute("aria-current","false");
+        b.innerHTML = '<span class="ico">'+m.ico+'</span><span>'+t(m.key)+'</span>';
+        b.addEventListener("click", function(){ openModule(m.id); });
+        nav.appendChild(b);
+      });
+    }
+  }
+
+  function renderTopbar(){
+    var titleKey, subKey;
+    if(current.module==="home"){ titleKey="home.title"; subKey="home.sub"; }
+    else if(current.module==="production"){ titleKey="title."+current.tab; subKey="sub."+current.tab; }
+    else { titleKey="title."+current.module; subKey="sub."+current.module; }
+    document.getElementById("pageTitle").textContent = t(titleKey);
+    document.getElementById("pageSub").textContent = t(subKey);
+
+    var tabs = document.getElementById("topbarTabs");
+    tabs.innerHTML = "";
+    var items = current.module==="production" ? PRODUCTION_TABS : HOME;
+    items.forEach(function(it){
+      var b = document.createElement("button");
+      var idKey = current.module==="production" ? "tab" : "module";
+      var active = current.module==="production" ? current.tab===it.id : current.module===it.id;
+      b.setAttribute("aria-current", String(active));
+      b.textContent = t(it.key);
+      b.addEventListener("click", function(){ current.module==="production" ? openProdTab(it.id) : openModule(it.id); });
+      tabs.appendChild(b);
+    });
+  }
+
+  /* ================= View renderers ================= */
+  var host = document.getElementById("viewHost");
+
+  function renderHome(){
+    var html = '<div class="home-hero"><h1>'+t("home.title")+'</h1><p>'+t("home.sub")+'</p></div><div class="home-grid">';
+    HOME.forEach(function(m){
+      html += '<button class="home-tile" data-open="'+m.id+'"><span class="ico">'+m.ico+'</span><b>'+t(m.key)+'</b><span>'+t(m.key+".d")+'</span></button>';
+    });
+    html += '</div>';
+    host.innerHTML = html;
+    host.querySelectorAll("[data-open]").forEach(function(el){
+      el.addEventListener("click", function(){ openModule(el.getAttribute("data-open")); });
+    });
+  }
+
+  var projects = [
+    {code:"PRJ-101", nameKey:null, name:"Room A1 / A2", pct:82, status:"good", statusKey:"status.inprod"},
+    {code:"PRJ-104", name:"Unit B12", pct:45, status:"warn", statusKey:"status.await"},
+    {code:"PRJ-108", name:"Block C", pct:100, status:"good", statusKey:"status.ready"},
+    {code:"PRJ-112", name:"Extension D2", pct:20, status:"neutral", statusKey:"status.eng"},
+    {code:"PRJ-115", name:"Site E", pct:63, status:"good", statusKey:"status.inprod"},
+    {code:"PRJ-119", name:"Dock Extension", pct:38, status:"crit", statusKey:"status.blocked"}
+  ];
+
+  function renderDashboard(){
+    var html = '<div class="kpi-row">'+
+      kpi(t("kpi.active"),"14",t("kpi.active.d")) +
+      kpi(t("kpi.readiness"),'68<small>%</small>',t("kpi.readiness.d")) +
+      kpi(t("kpi.panels"),'<span class="num">842<small>/1,180</small></span>',t("kpi.panels.d")) +
+      kpi(t("kpi.urgent"),'<span style="color:var(--crit)">3</span>',t("kpi.urgent.d"),true) +
+      '</div><div class="dash-grid">' +
+      '<div class="card"><div style="padding:13px 15px 0;"><div class="section-head" style="margin-bottom:0;"><h2 style="font-size:14.5px;">'+t("dash.projects")+'</h2><span class="hint">'+t("dash.projects.hint")+'</span></div></div>' +
+      '<div class="proj-list" id="projList"></div></div>' +
+      '<div style="display:flex; flex-direction:column; gap:14px;">' +
+      '<div class="card chart-card"><div class="section-head" style="margin-bottom:0;"><h2 style="font-size:14.5px;">'+t("dash.output")+'</h2><span class="hint num">+12%</span></div>' +
+      '<div class="bars" id="outputBars"></div><div class="bars-labels" id="outputLabels"></div></div>' +
+      '<div class="card"><div style="padding:13px 15px 0;"><h2 style="font-size:14.5px;">'+t("dash.attention")+'</h2></div><div class="attn-list" id="attnList"></div></div>' +
+      '</div></div>';
+    host.innerHTML = html;
+
+    var projList = document.getElementById("projList");
+    projects.forEach(function(p){
+      var row = document.createElement("div");
+      row.className = "proj-row";
+      row.innerHTML = '<div class="proj-name"><b>'+p.name+'</b><span>'+p.code+'</span></div>' +
+        '<span class="pill '+p.status+'">'+t(p.statusKey)+'</span>' +
+        '<div class="progress"><span style="width:'+p.pct+'%"></span></div>' +
+        '<span class="pct num">'+p.pct+'%</span>';
+      row.addEventListener("click", function(){ openProdTab("project"); });
+      projList.appendChild(row);
+    });
+
+    var outputVals = [58,66,61,74,70,79,84];
+    var maxOut = Math.max.apply(null, outputVals);
+    var barsEl = document.getElementById("outputBars");
+    var labelsEl = document.getElementById("outputLabels");
+    var dayLabels = lang==="he" ? ["א","ב","ג","ד","ה","ו","ש"] : ["S","M","T","W","T","F","S"];
+    outputVals.forEach(function(v,i){
+      var bar = document.createElement("div"); bar.className="bar";
+      bar.innerHTML = '<span style="height:'+Math.round(v/maxOut*100)+'%"></span>';
+      barsEl.appendChild(bar);
+      var lab = document.createElement("span"); lab.textContent = dayLabels[i]; labelsEl.appendChild(lab);
+    });
+
+    var attnItems = [
+      {sev:"crit", title: lang==="he"?"PRJ-119 — 2 רכיבים נפסלו בבדיקת איכות":"PRJ-119 — 2 components rejected in quality check", meta: lang==="he"?"Dock Extension · תוך 3 ימים":"Dock Extension · due in 3 days"},
+      {sev:"crit", title: lang==="he"?"PRJ-104 — חוסר במלאי רכיב D":"PRJ-104 — missing Component D stock", meta: lang==="he"?"Unit B12 · חוסם התקנה בשטח":"Unit B12 · blocks field install"},
+      {sev:"warn", title: lang==="he"?"PRJ-108 — אבן דרך בשלה לחיוב":"PRJ-108 — payment milestone matured", meta: "Block C"}
+    ];
+    var attnList = document.getElementById("attnList");
+    attnItems.forEach(function(a){
+      var el = document.createElement("div"); el.className="attn-item";
+      el.innerHTML = '<span class="dot '+a.sev+'"></span><span><b>'+a.title+'</b><span>'+a.meta+'</span></span>';
+      attnList.appendChild(el);
+    });
+  }
+  function kpi(label,value,delta,down){
+    return '<div class="card kpi"><span class="label">'+label+'</span><span class="value">'+value+'</span><span class="delta'+(down?" down":"")+'">'+delta+'</span></div>';
+  }
+
+  function renderProject(){
+    var rooms = [
+      {name: lang==="he"?"חדר A1":"Room A1", items:[
+        [lang==="he"?"רכיב A":"Component A","6 / 6","Assembly","normal"],
+        [lang==="he"?"רכיב B":"Component B","3 / 3","Finishing","normal"],
+        [lang==="he"?"תת-הרכבה A":"Sub-Assembly A","0 / 1","Design","urgent"]
+      ]},
+      {name: lang==="he"?"חדר A2":"Room A2", items:[
+        [lang==="he"?"רכיב A":"Component A","8 / 8","Staging","normal"],
+        [lang==="he"?"רכיב C":"Component C","4 / 4","Staging","normal"]
+      ]}
+    ];
+    var html = '<div class="info-bar">' +
+      infoCell(t("proj.delivery"), "2026-09-14") +
+      infoCell(t("proj.discount"), "5%") +
+      infoCell(t("proj.status"), '<span class="pill good">'+t("status.inprod")+'</span>') +
+      infoCell(t("proj.pricelist"), lang==="he"?"ברירת מחדל":"Default") +
+      '</div>';
+    rooms.forEach(function(r){
+      html += '<div class="room-block"><div class="room-block-head"><b>'+r.name+'</b><span class="pill accent">'+r.items.length+' '+(lang==="he"?"רכיבים":"components")+'</span></div>' +
+        '<div class="card"><div class="table-wrap"><table class="dt"><thead><tr><th>'+t("room.produced")+'</th><th>'+t("room.qty")+'</th><th>'+t("room.station")+'</th><th>'+t("room.priority")+'</th></tr></thead><tbody>';
+      r.items.forEach(function(it){
+        var pri = it[3]==="urgent" ? '<span class="pill crit">'+t("filter.urgent")+'</span>' : '<span class="pill neutral">'+t("filter.normal")+'</span>';
+        html += '<tr><td>'+it[0]+'</td><td class="num">'+it[1]+'</td><td>'+it[2]+'</td><td>'+pri+'</td></tr>';
+      });
+      html += '</tbody></table></div></div></div>';
+    });
+    host.innerHTML = html;
+  }
+  function infoCell(k,v){ return '<div class="info-cell"><div class="k">'+k+'</div><div class="v">'+v+'</div></div>'; }
+
+  var presets = [
+    {key:"preset.a", w:4, h:3, bom:[["Component A",14,7840],["Component B",6,3960],["Component C",4,1240],["Sub-Assembly A",1,2380],["Component D",12,2160]]},
+    {key:"preset.b", w:5.5, h:3.2, lshape:true, bom:[["Component A",19,10640],["Component B",8,5280],["Component C",6,1860],["Sub-Assembly B",1,3120],["Component D",17,3060]]},
+    {key:"preset.c", w:6, h:4, bom:[["Component A",20,11200],["Component B",9,5940],["Component C",4,1240],["Sub-Assembly A",2,4760],["Component D",20,3600]]}
+  ];
+  var presetIndex = 0;
+  function renderDrafting(){
+    host.innerHTML =
+      '<div class="preset-row" id="presetRow"></div>' +
+      '<div class="draft-grid">' +
+      '<div class="card canvas-card"><div class="canvas-frame"><svg id="roomSvg" viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg"></svg></div></div>' +
+      '<div class="card bom-card"><div class="bom-head"><h3>'+t("bom.title")+'</h3><span class="bom-total num" id="bomTotal">₪0</span></div>' +
+      '<div class="table-wrap"><table class="dt"><thead><tr><th>'+t("bom.component")+'</th><th class="num">'+t("bom.qty")+'</th><th class="num">'+t("bom.price")+'</th></tr></thead><tbody id="bomBody"></tbody></table></div></div>' +
+      '</div>';
+    var row = document.getElementById("presetRow");
+    presets.forEach(function(p,i){
+      var b = document.createElement("button"); b.className="preset-btn";
+      b.setAttribute("aria-pressed", String(i===presetIndex));
+      b.textContent = t(p.key);
+      b.addEventListener("click", function(){ presetIndex=i; renderDrafting(); });
+      row.appendChild(b);
+    });
+    var p = presets[presetIndex];
+    var svg = document.getElementById("roomSvg");
+    var scale=55, ox=60, oy=40, w=p.w*scale, h=p.h*scale, parts=[];
+    parts.push('<rect class="room-fill" x="'+ox+'" y="'+oy+'" width="'+w+'" height="'+h+'" />');
+    parts.push('<rect class="wall-line" fill="none" x="'+ox+'" y="'+oy+'" width="'+w+'" height="'+h+'" />');
+    if(p.lshape){
+      var cw=w*0.42, ch=h*0.5;
+      parts.push('<rect class="room-fill" x="'+(ox+w)+'" y="'+(oy+h-ch)+'" width="'+cw+'" height="'+ch+'" />');
+      parts.push('<path class="wall-line" fill="none" d="M '+(ox+w)+' '+(oy+h-ch)+' H '+(ox+w+cw)+' V '+(oy+h)+'" />');
+    }
+    [[ox,oy],[ox+w,oy],[ox,oy+h],[ox+w,oy+h]].forEach(function(c){ parts.push('<circle class="corner-dot" cx="'+c[0]+'" cy="'+c[1]+'" r="4" />'); });
+    var doorX = ox + w*0.5 - 22;
+    parts.push('<line class="door-leaf" x1="'+doorX+'" y1="'+(oy+h)+'" x2="'+(doorX+44)+'" y2="'+(oy+h)+'" />');
+    parts.push('<path class="door-arc" d="M '+doorX+' '+(oy+h)+' A 44 44 0 0 1 '+(doorX+44)+' '+(oy+h-44)+'" />');
+    parts.push('<text class="wall-label" x="'+(ox+w/2)+'" y="'+(oy-10)+'" text-anchor="middle">'+p.w.toFixed(1)+' m</text>');
+    parts.push('<text class="wall-label" x="'+(ox-14)+'" y="'+(oy+h/2)+'" text-anchor="middle" transform="rotate(-90 '+(ox-14)+' '+(oy+h/2)+')">'+p.h.toFixed(1)+' m</text>');
+    svg.innerHTML = parts.join("");
+    var body = document.getElementById("bomBody"); var total=0;
+    p.bom.forEach(function(r){ total+=r[2]; var tr=document.createElement("tr"); tr.innerHTML='<td>'+r[0]+'</td><td class="num">'+r[1]+'</td><td class="num">₪'+r[2].toLocaleString()+'</td>'; body.appendChild(tr); });
+    document.getElementById("bomTotal").textContent = "₪"+total.toLocaleString();
+  }
+
+  var stations = ["Design","Cutting","Forming","Assembly","Finishing","Staging","Dispatch"];
+  var components = [
+    {c:"Component A",p:"PRJ-101",st:0,pri:"normal"},{c:"Component C",p:"PRJ-104",st:0,pri:"urgent"},
+    {c:"Component B",p:"PRJ-101",st:1,pri:"normal"},{c:"Component A",p:"PRJ-115",st:1,pri:"normal"},
+    {c:"Sub-Assembly A",p:"PRJ-108",st:2,pri:"normal"},{c:"Component A",p:"PRJ-119",st:2,pri:"urgent"},
+    {c:"Component D",p:"PRJ-101",st:3,pri:"normal"},{c:"Component C",p:"PRJ-115",st:3,pri:"normal"},
+    {c:"Component A",p:"PRJ-104",st:4,pri:"urgent"},{c:"Component B",p:"PRJ-108",st:4,pri:"normal"},
+    {c:"Sub-Assembly B",p:"PRJ-115",st:5,pri:"normal"},{c:"Component A",p:"PRJ-108",st:6,pri:"normal"},{c:"Component B",p:"PRJ-101",st:6,pri:"normal"}
+  ];
+  var floorFilter = "all";
+  function renderFloor(){
+    host.innerHTML = '<div class="filter-row" id="floorFilters"></div><div class="kanban" id="kanbanBoard"></div>';
+    var row = document.getElementById("floorFilters");
+    [["all","filter.all"],["urgent","filter.urgent"],["normal","filter.normal"]].forEach(function(f){
+      var b=document.createElement("button"); b.className="filter-btn"; b.setAttribute("aria-pressed", String(floorFilter===f[0])); b.textContent=t(f[1]);
+      b.addEventListener("click", function(){ floorFilter=f[0]; renderFloor(); });
+      row.appendChild(b);
+    });
+    var board = document.getElementById("kanbanBoard");
+    stations.forEach(function(name, idx){
+      var col = document.createElement("div"); col.className="kb-col";
+      var items = components.filter(function(c){ return c.st===idx && (floorFilter==="all"||floorFilter===c.pri); });
+      var cardsHtml = items.map(function(c){
+        var pill = c.pri==="urgent" ? '<span class="pill crit">'+t("filter.urgent")+'</span>' : '<span class="pill neutral">'+t("filter.normal")+'</span>';
+        return '<div class="kb-card"><b>'+c.c+'</b><span class="meta">'+c.p+'</span>'+pill+'</div>';
+      }).join("");
+      col.innerHTML = '<div class="kb-col-head"><b>'+name+'</b> <span class="count num">'+items.length+'</span></div><div class="kb-col-body">'+cardsHtml+'</div>';
+      board.appendChild(col);
+    });
+  }
+
+  function renderDoors(){
+    var cols = lang==="he" ? ["ממתין למדידה בשטח","בייצור","ממתין להתקנה","הותקן"] : ["Awaiting On-Site Measurement","In Production","Awaiting Installation","Installed"];
+    var subs = [
+      {p:"PRJ-101",st:0},{p:"PRJ-104",st:1},{p:"PRJ-108",st:2},{p:"PRJ-115",st:1},{p:"PRJ-119",st:0},{p:"PRJ-108",st:3},{p:"PRJ-101",st:3}
+    ];
+    var html = '<div class="kanban">';
+    cols.forEach(function(name, idx){
+      var items = subs.filter(function(d){ return d.st===idx; });
+      html += '<div class="kb-col"><div class="kb-col-head"><b>'+name+'</b> <span class="count num">'+items.length+'</span></div><div class="kb-col-body">';
+      items.forEach(function(d){ html += '<div class="kb-card"><b>'+d.p+'</b><span class="meta">'+(lang==="he"?"תת-הרכבה E":"Sub-Assembly E")+'</span></div>'; });
+      html += '</div></div>';
+    });
+    html += '</div>';
+    host.innerHTML = html;
+  }
+
+  function renderSchedule(){
+    var timeline = [
+      {name:"PRJ-101", start:5, len:55, warn:false},{name:"PRJ-104", start:15, len:40, warn:true},
+      {name:"PRJ-108", start:0, len:70, warn:false},{name:"PRJ-112", start:60, len:30, warn:false},{name:"PRJ-119", start:35, len:20, warn:true}
+    ];
+    var html = '<div class="card gantt"><h3 style="font-size:13px; margin-bottom:10px;">'+ (lang==="he"?"ציר זמן פרויקטים":"Project Timeline") +'</h3><div id="ganttRows"></div></div>' +
+      '<div class="card" style="padding:15px;"><h3 style="font-size:13px; margin-bottom:10px;">'+(lang==="he"?"שיבוץ צוותי שטח — השבוע":"Field-Team Assignment — This Week")+'</h3><div class="table-wrap"><div class="week-grid" id="weekGrid"></div></div></div>';
+    host.innerHTML = html;
+    var ganttRows = document.getElementById("ganttRows");
+    timeline.forEach(function(tm){
+      var row = document.createElement("div"); row.className="gantt-row";
+      row.innerHTML = '<span class="label">'+tm.name+'</span><div class="gantt-track"><div class="gantt-bar'+(tm.warn?" warn":"")+'" style="inset-inline-start:'+tm.start+'%; width:'+tm.len+'%"></div></div>';
+      ganttRows.appendChild(row);
+    });
+    var days = lang==="he" ? ["א","ב","ג","ד","ה"] : ["Mon","Tue","Wed","Thu","Fri"];
+    var teams = lang==="he" ? ["צוות אלפא","צוות צפון","צוות דרום"] : ["Team Alpha","Team North","Team South"];
+    var assignments = { 0:["PRJ-101","PRJ-101","","PRJ-108","PRJ-108"], 1:["","PRJ-104","PRJ-104","","PRJ-115"], 2:["PRJ-119","","PRJ-119","PRJ-112",""] };
+    var wg = document.getElementById("weekGrid");
+    wg.innerHTML = '<div class="wh"></div>' + days.map(function(d){ return '<div class="wh">'+d+'</div>'; }).join("");
+    teams.forEach(function(team,ti){
+      wg.innerHTML += '<div>'+team+'</div>';
+      assignments[ti].forEach(function(v){ var warn=v==="PRJ-119"; wg.innerHTML += '<div>' + (v ? '<span class="assign-chip'+(warn?" warn":"")+'">'+v+'</span>' : "") + '</div>'; });
+    });
+  }
+
+  function renderWarehouse(){
+    var stock = [["CA-2400","Component A — 240cm",34,20],["CB-1800","Component B — 180cm",12,15],["CC-STD","Component C — Standard",8,10],["SA-STD","Sub-Assembly A",3,4],["CD-50","Component D — 50mm",61,40]];
+    var po = [["PO-3311","Supplier A","Sent",4],["PO-3312","Supplier B","Confirmed",7],["PO-3313","Supplier A","Draft",2],["PO-3314","Supplier C","Partially Received",5]];
+    var poStatusMap = {he:{"Sent":"נשלחה","Confirmed":"אושרה","Draft":"טיוטה","Partially Received":"חלקית הגיעה"}};
+    var low = stock.filter(function(s){ return s[2] < s[3]; }).length;
+    var html = '<div class="stat-strip"><div class="stat-chip"><b>'+low+'</b><span>'+t("wh.lowstock")+'</span></div><div class="stat-chip"><b>'+po.length+'</b><span>'+t("wh.openpo")+'</span></div></div>' +
+      '<div class="card" style="margin-bottom:14px;"><div style="padding:13px 15px 0;"><h2 style="font-size:14.5px;">'+t("wh.stock")+'</h2></div><div class="table-wrap"><table class="dt"><thead><tr><th>'+t("wh.sku")+'</th><th>'+t("wh.item")+'</th><th class="num">'+t("wh.onhand")+'</th><th class="num">'+t("wh.min")+'</th><th></th></tr></thead><tbody>';
+    stock.forEach(function(s){
+      var low2 = s[2] < s[3];
+      html += '<tr><td class="num">'+s[0]+'</td><td>'+s[1]+'</td><td class="num">'+s[2]+'</td><td class="num">'+s[3]+'</td><td>'+(low2?'<span class="pill warn">'+ (lang==="he"?"מלאי נמוך":"Low Stock") +'</span>':'<span class="pill good">'+(lang==="he"?"תקין":"OK")+'</span>')+'</td></tr>';
+    });
+    html += '</tbody></table></div></div>' +
+      '<div class="card"><div style="padding:13px 15px 0;"><h2 style="font-size:14.5px;">'+t("wh.po")+'</h2></div><div class="table-wrap"><table class="dt"><thead><tr><th>PO#</th><th>'+t("wh.supplier")+'</th><th>'+t("wh.postatus")+'</th><th class="num">'+(lang==="he"?"שורות":"Lines")+'</th></tr></thead><tbody>';
+    po.forEach(function(p){
+      var label = lang==="he" ? (poStatusMap.he[p[2]]||p[2]) : p[2];
+      html += '<tr><td class="num">'+p[0]+'</td><td>'+p[1]+'</td><td><span class="pill accent">'+label+'</span></td><td class="num">'+p[3]+'</td></tr>';
+    });
+    html += '</tbody></table></div></div>';
+    host.innerHTML = html;
+  }
+
+  function renderHR(){
+    var depts = lang==="he" ?
+      [["ייצור",18,20],["מחסן",6,6],["התקנת שטח",9,10],["הנהלה",4,4]] :
+      [["Production",18,20],["Warehouse",6,6],["Field Installation",9,10],["Administration",4,4]];
+    var roles = lang==="he" ? ["מפעיל קו","ראש משמרת","טכנאי שטח","פקיד מחסן"] : ["Line Operator","Shift Lead","Field Technician","Warehouse Clerk"];
+    var days = lang==="he" ? ["א","ב","ג","ד","ה"] : ["Mon","Tue","Wed","Thu","Fri"];
+    var att = [[1,1,1,1,0],[1,1,1,1,1],[1,0,1,1,1],[1,1,1,0,1]];
+    var html = '<div class="card" style="margin-bottom:14px;"><div style="padding:13px 15px 0;"><h2 style="font-size:14.5px;">'+t("hr.staffing")+'</h2></div><div class="table-wrap"><table class="dt"><thead><tr><th>'+t("hr.dept")+'</th><th class="num">'+t("hr.today")+'</th><th class="num">'+t("hr.target")+'</th><th></th></tr></thead><tbody>';
+    depts.forEach(function(d){
+      var short = d[1] < d[2];
+      html += '<tr><td>'+d[0]+'</td><td class="num">'+d[1]+'</td><td class="num">'+d[2]+'</td><td>'+(short?'<span class="pill warn">'+(lang==="he"?"מחסור":"Understaffed")+'</span>':'<span class="pill good">'+(lang==="he"?"תקין":"OK")+'</span>')+'</td></tr>';
+    });
+    html += '</tbody></table></div></div>' +
+      '<div class="card"><div style="padding:13px 15px 0;"><h2 style="font-size:14.5px;">'+t("hr.calendar")+'</h2></div><div class="table-wrap"><table class="dt"><thead><tr><th>'+(lang==="he"?"תפקיד":"Role")+'</th>'+days.map(function(d){return '<th class="num">'+d+'</th>';}).join("")+'</tr></thead><tbody>';
+    roles.forEach(function(r,ri){
+      html += '<tr><td>'+r+'</td>'+att[ri].map(function(v){ return '<td class="num">'+(v? '<span class="pill good" style="padding:2px 8px;">✓</span>' : '<span class="pill neutral" style="padding:2px 8px;">—</span>')+'</td>'; }).join("")+'</tr>';
+    });
+    html += '</tbody></table></div></div>';
+    host.innerHTML = html;
+  }
+
+  function renderInvoices(){
+    var rows = [
+      ["PRJ-101", lang==="he"?"מקדמה":"Upfront", lang==="he"?"מיידי":"Immediate", "₪42,000", "good", lang==="he"?"שולמה":"Paid"],
+      ["PRJ-101", lang==="he"?"אחרי ייצור":"On Production", lang==="he"?"מוכנות ייצור":"Production Ready", "₪63,000", "warn", lang==="he"?"בשלה — לחייב!":"Matured — bill now!"],
+      ["PRJ-108", lang==="he"?"אחרי התקנה":"On Installation", lang==="he"?"סיום התקנה":"Installation Complete", "₪55,000", "accent", lang==="he"?"נשלחה":"Sent"],
+      ["PRJ-119", lang==="he"?"בסיום":"On Completion", lang==="he"?"סגירת פרויקט":"Project Closeout", "₪28,000", "neutral", lang==="he"?"ממתין":"Waiting"]
+    ];
+    var html = '<div class="card"><div class="table-wrap"><table class="dt"><thead><tr><th>'+t("inv.project")+'</th><th>'+t("inv.milestone")+'</th><th>'+t("inv.trigger")+'</th><th class="num">'+t("inv.amount")+'</th><th>'+t("inv.status")+'</th></tr></thead><tbody>';
+    rows.forEach(function(r){ html += '<tr><td class="num">'+r[0]+'</td><td>'+r[1]+'</td><td>'+r[2]+'</td><td class="num">'+r[3]+'</td><td><span class="pill '+r[4]+'">'+r[5]+'</span></td></tr>'; });
+    html += '</tbody></table></div></div>';
+    host.innerHTML = html;
+  }
+
+  function renderLogistics(){
+    var vehicles = [["V-01","Van","2022","2026-10-02","good"],["V-02","Truck","2020","2026-09-01","warn"],["V-03","Van","2023","2027-01-15","good"]];
+    var procs = [[lang==="he"?"בטיחות — הפעלת מלגזה":"Safety — Forklift Operation","1.3"],[lang==="he"?"איכות — בדיקת רכיבים":"Quality — Component Inspection","2.1"],[lang==="he"?"רכש — אישור ספק":"Procurement — Supplier Approval","1.0"]];
+    var html = '<div class="section-head"><h2 style="font-size:14.5px;">'+t("lg.fleet")+'</h2></div><div class="card-grid" style="margin-bottom:16px;">';
+    vehicles.forEach(function(v){
+      html += '<div class="card mini-card"><div class="mini-card-head"><b>'+v[0]+'</b><span class="pill '+v[4]+'">'+t("lg.expiry")+'</span></div>' +
+        '<div class="row"><span>'+v[1]+'</span><span>'+v[2]+'</span></div><div class="row num"><span>'+v[3]+'</span></div></div>';
+    });
+    html += '</div><div class="section-head"><h2 style="font-size:14.5px;">'+t("lg.procedures")+'</h2></div><div class="card"><div class="table-wrap"><table class="dt"><thead><tr><th>'+(lang==="he"?"נוהל":"Procedure")+'</th><th class="num">'+t("lg.version")+'</th></tr></thead><tbody>';
+    procs.forEach(function(p){ html += '<tr><td>'+p[0]+'</td><td class="num">v'+p[1]+'</td></tr>'; });
+    html += '</tbody></table></div></div>';
+    host.innerHTML = html;
+  }
+
+  function renderTasks(){
+    var cols = [["tasks.open",[["Replace cutting blade — Station 2","urgent"],["Order raw material stock","normal"]]],
+      ["tasks.progress",[["Confirm delivery window — PRJ-108","normal"],["Calibrate forming press","normal"]]],
+      ["tasks.done",[["Weekly safety walk-through","normal"],["Restock Component C bin","normal"]]]];
+    var html = '<div class="kanban">';
+    cols.forEach(function(c){
+      html += '<div class="kb-col"><div class="kb-col-head"><b>'+t(c[0])+'</b> <span class="count num">'+c[1].length+'</span></div><div class="kb-col-body">';
+      c[1].forEach(function(item){
+        var pill = item[1]==="urgent" ? '<span class="pill crit">'+t("filter.urgent")+'</span>' : '<span class="pill neutral">'+t("filter.normal")+'</span>';
+        html += '<div class="kb-card"><b>'+item[0]+'</b>'+pill+'</div>';
+      });
+      html += '</div></div>';
+    });
+    html += '</div>';
+    host.innerHTML = html;
+  }
+
+  function renderView(){
+    if(current.module==="home") return renderHome();
+    if(current.module==="production"){
+      if(current.tab==="dashboard") return renderDashboard();
+      if(current.tab==="project") return renderProject();
+      if(current.tab==="drafting") return renderDrafting();
+      if(current.tab==="floor") return renderFloor();
+      if(current.tab==="doors") return renderDoors();
+      if(current.tab==="schedule") return renderSchedule();
+    }
+    if(current.module==="warehouse") return renderWarehouse();
+    if(current.module==="hr") return renderHR();
+    if(current.module==="invoices") return renderInvoices();
+    if(current.module==="logistics") return renderLogistics();
+    if(current.module==="tasks") return renderTasks();
+  }
+
+  function renderAll(){
+    applyI18n();
+    renderNav();
+    renderTopbar();
+    renderView();
+  }
+
+  setLang("he");
+})();
+</script>
+</body>
+</html>

@@ -86,16 +86,16 @@ module.
 
 ## Live prototype
 
-**[Open the interactive prototype →](https://claude.ai/code/artifact/cdc94b44-572a-4d87-9be9-01e3962baff4)**
+**[Open the interactive prototype →](https://morsigman.github.io/Operational-Management-System-Portfolio/)**
 
 A click-through, read-only recreation of the full system — same visual
 design, same module structure, same screens as the real application
 (dashboard, drafting & automatic BOM, production floor, sub-assembly
 tracking, scheduling, warehouse, HR, invoice control, logistics, and
-tasks). It is a static prototype with no backend: nothing typed or clicked
-is saved or transmitted anywhere. All data shown is fictional and
+tasks). It is a static page with no backend: nothing typed or clicked is
+saved or transmitted anywhere. All data shown is fictional and
 genericized — no real names, prices, projects, or industry-identifying
-details.
+details. Opens directly in any browser, no account required.
 
 ## Screenshots
 
