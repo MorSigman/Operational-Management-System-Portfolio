@@ -7,6 +7,15 @@
 > data, production source code, credentials, and confidential implementation
 > details are intentionally excluded.
 
+## 🔗 [Open the live interactive prototype](https://morsigman.github.io/Operational-Management-System-Portfolio/)
+
+A click-through, read-only recreation of the full system — same visual
+design, same module structure, same screens as the real application
+(dashboard, drafting & automatic BOM, production floor, sub-assembly
+tracking, scheduling, warehouse, HR, invoice control, logistics, and
+tasks). Static page, no backend, no account required — everything shown
+is fictional and genericized.
+
 ## Overview
 
 An **ERP-lite operational management platform** built for a manufacturing
@@ -83,19 +92,6 @@ module.
 - [Modules](docs/modules.md) — full feature breakdown per module
 - [Workflows](docs/workflows.md) — key end-to-end business workflows
 - [Architecture](docs/architecture.md) — technical design decisions
-
-## Live prototype
-
-**[Open the interactive prototype →](https://morsigman.github.io/Operational-Management-System-Portfolio/)**
-
-A click-through, read-only recreation of the full system — same visual
-design, same module structure, same screens as the real application
-(dashboard, drafting & automatic BOM, production floor, sub-assembly
-tracking, scheduling, warehouse, HR, invoice control, logistics, and
-tasks). It is a static page with no backend: nothing typed or clicked is
-saved or transmitted anywhere. All data shown is fictional and
-genericized — no real names, prices, projects, or industry-identifying
-details. Opens directly in any browser, no account required.
 
 ## Screenshots
 
