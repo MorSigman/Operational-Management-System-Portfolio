@@ -123,6 +123,19 @@
   .topbar-tabs button{ flex:none; background:var(--surface-2); border:1px solid var(--border); color:var(--ink-3); padding:6px 10px; border-radius:999px; font-size:11.5px; cursor:pointer; }
   .topbar-tabs button[aria-current="true"]{ background:#2563eb; color:#fff; }
 
+  /* Module header — matches ProductionModule.tsx's own header exactly (dark: slate-800, no gradient) */
+  .topbar.mod{ background:#1e293b; border-bottom-color:#334155; }
+  .mod-headrow{ display:flex; align-items:center; gap:11px; flex:1; min-width:0; }
+  .mod-headrow .mico{ color:#fff; font-size:19px; flex:none; }
+  .mod-headrow .eyebrow{ font-size:10.5px; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; color:#93c5fd; }
+  .mod-headrow .modtitle{ font-size:13.5px; font-weight:600; color:#fff; }
+  .modtabs{ display:flex !important; gap:2px; overflow-x:auto; padding:0 20px !important; border-bottom:1px solid #334155 !important; background:#1e293b !important; }
+  .modtabs button{ flex:none !important; background:none !important; border:none !important; border-bottom:2px solid transparent !important; color:rgba(255,255,255,0.6) !important; padding:9px 15px !important; border-radius:0 !important; font-size:12.5px !important; font-weight:600 !important; display:flex; align-items:center; gap:6px; }
+  .modtabs button:hover{ color:rgba(255,255,255,0.9) !important; }
+  .modtabs button[aria-current="true"]{ background:rgba(255,255,255,0.1) !important; border-bottom-color:#fff !important; color:#fff !important; }
+  .modtabs .tb{ font-size:9.5px; font-weight:800; min-width:16px; text-align:center; padding:1px 4px; border-radius:999px; background:rgba(255,255,255,0.2); }
+  .modtabs .tb.red{ background:#ef4444; color:#fff; }
+
   .view{ max-width:1800px; margin:0 auto; padding:22px 20px 40px; }
 
   /* ============ Shared primitives ============ */
@@ -357,9 +370,13 @@
 </aside>
 
 <div class="sh-main">
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="greet"><b id="pageTitle">—</b><span id="pageSub">—</span></div>
+  <div class="topbar" id="topbarEl">
+    <div class="topbar-inner" id="topbarInner" style="height:68px;">
+      <div class="mod-headrow" id="modHeadRow" style="display:none;">
+        <span class="mico" id="modIco">▦</span>
+        <div><div class="eyebrow" data-i18n="mod.eyebrow">מודול</div><div class="modtitle" id="modTitle">—</div></div>
+      </div>
+      <div class="greet" id="homeGreet"><b id="pageTitle">—</b><span id="pageSub">—</span></div>
       <div class="topbar-actions">
         <span class="cloud-pill" data-i18n="cloud.status">מחובר לענן</span>
         <span class="vsep"></span>
@@ -402,6 +419,7 @@
     "cloud.status":["מחובר לענן","Connected to cloud"],
     "footer.note":["פרוטוטייפ אינטראקטיבי לתיק עבודות — נבנה מחדש באופן עצמאי עם נתונים בדיוניים בלבד. לא מחובר לשום מערכת אמיתית.","Interactive portfolio prototype — recreated independently with fictional data only. Not connected to any real system."],
     "back":["חזרה לדף הבית","Back to home"],
+    "mod.eyebrow":["מודול","Module"],
 
     "home.title":["לילה טוב","Good evening"],
     "home.sub":["יום שני, 24 באוגוסט 2026","Monday, August 24 2026"],
@@ -628,25 +646,49 @@
     }
   }
 
+  var MOD_ICO = {production:"🏭", warehouse:"📦", hr:"👥", invoices:"📄", logistics:"🚚", tasks:"☑"};
+
   function renderTopbar(){
     var titleKey, subKey;
-    if(current.module==="home"){ titleKey="home.title"; subKey="home.sub"; }
-    else if(current.module==="production"){ titleKey="title."+current.tab; subKey="sub."+current.tab; }
-    else { titleKey="title."+current.module; subKey="sub."+current.module; }
+    var topbarEl = document.getElementById("topbarEl");
+    var modRow = document.getElementById("modHeadRow");
+    var homeRow = document.getElementById("homeGreet");
+    var tabs = document.getElementById("topbarTabs");
+
+    if(current.module==="home"){
+      titleKey="home.title"; subKey="home.sub";
+      topbarEl.classList.remove("mod");
+      modRow.style.display = "none";
+      homeRow.style.display = "block";
+      tabs.classList.remove("modtabs");
+      tabs.style.display = "";
+    } else {
+      topbarEl.classList.add("mod");
+      modRow.style.display = "flex";
+      homeRow.style.display = "none";
+      document.getElementById("modIco").textContent = MOD_ICO[current.module] || "▦";
+      document.getElementById("modTitle").textContent = t("home."+current.module) + (current.module==="production" ? " — " + t("nav."+current.tab) : "");
+      if(current.module==="production"){ titleKey="title."+current.tab; subKey="sub."+current.tab; }
+      else { titleKey="title."+current.module; subKey="sub."+current.module; }
+    }
     document.getElementById("pageTitle").textContent = t(titleKey);
     document.getElementById("pageSub").textContent = t(subKey);
 
-    var tabs = document.getElementById("topbarTabs");
     tabs.innerHTML = "";
-    var items = current.module==="production" ? PRODUCTION_TABS : HOME;
-    items.forEach(function(it){
-      var b = document.createElement("button");
-      var active = current.module==="production" ? current.tab===it.id : current.module===it.id;
-      b.setAttribute("aria-current", String(active));
-      b.textContent = t(it.key);
-      b.addEventListener("click", function(){ current.module==="production" ? openProdTab(it.id) : openModule(it.id); });
-      tabs.appendChild(b);
-    });
+    if(current.module==="production"){
+      tabs.classList.add("modtabs");
+      tabs.style.display = "flex";
+      PRODUCTION_TABS.forEach(function(it){
+        var b = document.createElement("button");
+        var active = current.tab===it.id;
+        b.setAttribute("aria-current", String(active));
+        b.innerHTML = '<span>'+t(it.key)+'</span>';
+        b.addEventListener("click", function(){ openProdTab(it.id); });
+        tabs.appendChild(b);
+      });
+    } else if(current.module!=="home"){
+      tabs.style.display = "none";
+    }
   }
 
   /* ================= View renderers ================= */
