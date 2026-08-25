@@ -232,15 +232,17 @@
   table.dt td.num, table.dt th.num{ text-align:end; }
   .table-wrap{ overflow-x:auto; }
 
-  .stat-tiles{ display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:16px; }
+  .stat-tiles{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:16px; }
   @media (max-width:800px){ .stat-tiles{ grid-template-columns:repeat(2,1fr);} }
-  .stat-tile{ border-radius:14px; padding:16px; color:#fff; display:flex; flex-direction:column; gap:6px; box-shadow:var(--shadow); }
-  .stat-tile .v{ font-size:24px; font-weight:800; }
-  .stat-tile .l{ font-size:11px; opacity:0.9; }
-  .stat-tile.t-purple{ background:linear-gradient(140deg,#7C3AED,#5B21B6); }
-  .stat-tile.t-good{ background:linear-gradient(140deg,#059669,#047857); }
-  .stat-tile.t-warn{ background:linear-gradient(140deg,#d97706,#92400e); }
-  .stat-tile.t-info{ background:linear-gradient(140deg,#2563eb,#1D4ED8); }
+  .stat-tile{ border-radius:16px; padding:18px 20px; display:flex; align-items:flex-start; gap:14px; }
+  .stat-tile .icon{ width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex:none; font-size:19px; }
+  .stat-tile .v{ font-size:26px; font-weight:900; line-height:1; }
+  .stat-tile .l{ font-size:12.5px; font-weight:600; color:var(--ink-2); margin-top:3px; }
+  .stat-tile .sub{ font-size:11px; color:var(--ink-3); margin-top:2px; }
+  .stat-tile.t-purple{ background:#2e1065; } .stat-tile.t-purple .icon{ background:#4c1d95; color:#a78bfa; } .stat-tile.t-purple .v{ color:#c4b5fd; }
+  .stat-tile.t-good{ background:#022c22; } .stat-tile.t-good .icon{ background:#064e3b; color:#10b981; } .stat-tile.t-good .v{ color:#6ee7b7; }
+  .stat-tile.t-warn{ background:#451a03; } .stat-tile.t-warn .icon{ background:#78350f; color:#d97706; } .stat-tile.t-warn .v{ color:#fcd34d; }
+  .stat-tile.t-info{ background:#172554; } .stat-tile.t-info .icon{ background:#1e3a8a; color:#3b82f6; } .stat-tile.t-info .v{ color:#93c5fd; }
 
   .pcard-grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(240px,1fr)); gap:12px; }
   .pcard{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px; box-shadow:var(--shadow); display:flex; flex-direction:column; gap:8px; }
@@ -766,10 +768,10 @@
 
   function renderDashboard(){
     var html = '<div class="stat-tiles">' +
-      '<div class="stat-tile t-purple"><div class="v">45%</div><div class="l">'+(lang==="he"?"קצב מוכנות כללי":"Overall Readiness Rate")+'</div></div>' +
-      '<div class="stat-tile t-good"><div class="v num">386</div><div class="l">'+(lang==="he"?"סה״כ פאנלים יוצרו":"Total Panels Produced")+'</div></div>' +
-      '<div class="stat-tile t-warn"><div class="v num">858</div><div class="l">'+(lang==="he"?"סה״כ פאנלים נדרשים":"Total Panels Required")+'</div></div>' +
-      '<div class="stat-tile t-info"><div class="v num">5</div><div class="l">'+(lang==="he"?"פרויקטים פעילים מתוך 5":"Active Projects Out of 5")+'</div></div>' +
+      statTile("t-info",(lang==="he"?"פרויקטים פעילים":"Active Projects"),"5","◔",(lang==="he"?"מתוך 5 סה״כ":"out of 5 total")) +
+      statTile("t-warn",(lang==="he"?'סה״כ פאנלים נדרשים':"Total Panels Required"),"858","▦",(lang==="he"?"בכל הפרויקטים":"across all projects")) +
+      statTile("t-good",(lang==="he"?'סה״כ פאנלים יוצרו':"Total Panels Produced"),"386","✓",(lang==="he"?"נותר: 472":"remaining: 472")) +
+      statTile("t-purple",(lang==="he"?"קצב מוכנות כללי":"Overall Readiness Rate"),"45%","↗",(lang==="he"?"יוצרו מסך הנדרש":"of total required")) +
       '</div>' +
       '<div class="toolbar"><button class="btn primary">+ '+(lang==="he"?"פרויקט חדש":"New Project")+'</button><button class="btn ghost">'+(lang==="he"?"הזמנת דלת":"Order Door")+'</button>' +
       '<input class="search-box" placeholder="'+(lang==="he"?"חיפוש לפי שם, מספר הזמנה, לקוח...":"Search name, order #, client...")+'" style="flex:1"></div>' +
@@ -981,8 +983,8 @@
     }
     cal.innerHTML = h;
   }
-  function statTile(cls,label,value){
-    return '<div class="stat-tile '+cls+'"><div class="v num">'+value+'</div><div class="l">'+label+'</div></div>';
+  function statTile(cls,label,value,ico,sub){
+    return '<div class="stat-tile '+cls+'"><div class="icon">'+(ico||"●")+'</div><div><div class="v num">'+value+'</div><div class="l">'+label+'</div>'+(sub?'<div class="sub">'+sub+'</div>':'')+'</div></div>';
   }
 
   function renderInvoices(){
